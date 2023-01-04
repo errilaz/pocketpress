@@ -11,7 +11,8 @@ const library = buildLibrary()
 
 export function template(path: string) {
   const include = `
-include = Markup.includeFrom "${path}"
+include = Markup.include-from "${path}"
+load-file = Markup.load-file-from "${path}"
 `
   const ls = library + include + readFile(path, "utf8")
   const js = compile(`return (${ls})`, path)

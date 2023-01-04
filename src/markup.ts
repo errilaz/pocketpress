@@ -2,6 +2,7 @@ import { resolve, dirname } from "path"
 import { template } from "./template"
 import escape from "escape-html"
 import { marked } from "marked"
+import { readFileSync as readFile } from "fs"
 
 export class Element {
   tag: string
@@ -147,6 +148,13 @@ module Markup {
 
   export function markdown(markdown: string) {
     return new Raw(marked.parse(markdown))
+  }
+
+  export function loadFileFrom(context: string) {
+    return function loadFile(file: string) {
+      const path = resolve(dirname(context), file)
+      return readFile(path, "utf8")
+    }
   }
 }
 
