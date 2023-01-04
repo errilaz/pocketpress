@@ -1,8 +1,6 @@
 import options from "toptions"
-import { readdir, stat } from "fs/promises"
-import { join, resolve } from "path"
-import { template } from "./template"
-import { writeFileSync as writeFile } from "fs"
+import { resolve } from "path"
+import { scan } from "./build"
 
 const cwd = process.cwd()
 
@@ -21,42 +19,8 @@ if (help) {
   process.exit(0)
 }
 
-// Run command
-
-cli()
+scan(root!)
   .catch(e => { console.error(e); process.exit(1) })
-
-async function cli() {
-  scan(root!)
-}
-
-async function scan(dir: string) {
-  if (verbose) console.log(`scanning ${local(dir)}`)
-  const names = await readdir(dir)
-  for (const name of names) {
-    const path = join(dir, name)
-    const entry = await stat(path)
-    if (entry.isFile()) build(path)
-    else if (entry.isDirectory()) {
-      scan(path)
-    }
-  }
-}
-
-const doctype = "<!DOCTYPE html>"
-
-function build(path: string) {
-  if (!path.endsWith(".html.ls")) return
-  if (verbose) console.log(`building ${local(path)}`)
-  const result = template(path)
-  const markup = result.page.toString()
-  const output = `${doctype}\n${markup}`
-  writeFile(path.substring(0, path.length - 3), output, "utf8")
-}
-
-function local(path: string) {
-  return "." + path.substring(root.length)
-}
 
 function usage() {
   console.log(`Usage: pocket [options]
