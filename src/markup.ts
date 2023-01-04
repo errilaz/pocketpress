@@ -1,6 +1,7 @@
 import { resolve, dirname } from "path"
 import { template } from "./template"
 import escape from "escape-html"
+import { marked } from "marked"
 
 export class Element {
   tag: string
@@ -142,6 +143,10 @@ module Markup {
 
   export function raw(object: any) {
     return new Raw(object)
+  }
+
+  export function markdown(markdown: string) {
+    return new Raw(marked.parse(markdown))
   }
 }
 

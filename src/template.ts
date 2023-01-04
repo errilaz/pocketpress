@@ -23,6 +23,7 @@ function buildLibrary() {
 Markup = (require "pocketpress/markup").default
 rule = Markup.rule
 raw = Markup.raw
+markdown = Markup.markdown
 ${tags.map((tag: string) => {
   const isVoid = (voids as string[]).includes(tag)
   const name = reserved.includes(tag) ? `_${tag}` : tag
