@@ -6,7 +6,6 @@ import { template } from "./template"
 import { writeFileSync as writeFile } from "fs"
 
 export async function scan(root: string, excludes: string[]) {
-  console.log(excludes)
   await scanDir(root)
 
   async function scanDir(dir: string) {

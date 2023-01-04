@@ -6,7 +6,8 @@
 
 ## TODO
 
-- [ ] `raw`, proper escaping
+- [x] `raw`, proper escaping
+- [ ] Memoize template library
 - [ ] Page tags
 - [ ] Page date
 - [ ] Authors

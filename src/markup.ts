@@ -1,5 +1,6 @@
 import { resolve, dirname } from "path"
 import { template } from "./template"
+import escape from "escape-html"
 
 export class Element {
   tag: string
@@ -40,7 +41,7 @@ export class Element {
       }
     }
     else {
-      this.children.push(content)
+      this.children.push(escape(content.toString()))
     }
   }
 
@@ -103,6 +104,18 @@ export class Rule {
   }
 }
 
+export class Raw {
+  text: string
+
+  constructor(object: any) {
+    this.text = object === null || object === undefined ? "" : object.toString()
+  }
+
+  toString() {
+    return this.text
+  }
+}
+
 module Markup {
   export function rule(selector: string, ...properties: Property[]) {
     return new Rule(selector, properties)
@@ -126,6 +139,10 @@ module Markup {
       return template(path)
     }
   }
+
+  export function raw(object: any) {
+    return new Raw(object)
+  }
 }
 
 export default Markup
@@ -141,8 +158,5 @@ function isChild(x: any) {
   return x === true
     || x instanceof Element
     || x instanceof Rule
-    || x instanceof Date
-    || typeof x === "string"
-    || typeof x === "number"
-    || typeof x === "bigint"
+    || x instanceof Raw
 }
