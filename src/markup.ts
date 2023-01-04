@@ -124,8 +124,35 @@ module Markup {
   }
 
   export function element(tag: string, isVoid: boolean) {
-    return function element(...contents: any[]) {
+    return new Proxy(createElement, { get: withClass })
+
+    function createElement(...contents: any[]): Element {
       return new Element(tag, isVoid, contents)
+    }
+
+    function withClass(obj: any, cssClass: string) {
+      cssClass = kebabize(cssClass)
+      const proxy = new Proxy(createElement.bind(null, { class: cssClass }), {
+        get: withAnotherClass
+      })
+      Object.defineProperty(proxy, "_cssClass", {
+        value: cssClass,
+        enumerable: false
+      })
+      return proxy
+    }
+
+    function withAnotherClass(obj: any, cssClass: string): Element {
+      cssClass = kebabize(cssClass)
+      const classes = [obj._cssClass, cssClass].join(" ")
+      const proxy = new Proxy(createElement.bind(null, { class: classes }), {
+        get: withAnotherClass
+      })
+      Object.defineProperty(proxy, "_cssClass", {
+        value: classes,
+        enumerable: false
+      })
+      return proxy
     }
   }
 
@@ -172,4 +199,8 @@ function isChild(x: any) {
     || x instanceof Element
     || x instanceof Rule
     || x instanceof Raw
+}
+
+export function kebabize(camel: string) {
+  return camel.replace(/[A-Z]/g, c => "-" + c.toLowerCase());
 }
