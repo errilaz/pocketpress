@@ -5,14 +5,22 @@ import { join } from "path"
 import { template } from "./template"
 import { writeFileSync as writeFile } from "fs"
 
-export async function scan(dir: string) {
-  const names = await readdir(dir)
-  for (const name of names) {
-    const path = join(dir, name)
-    const entry = await stat(path)
-    if (entry.isFile()) build(path)
-    else if (entry.isDirectory()) {
-      scan(path)
+export async function scan(root: string, excludes: string[]) {
+  console.log(excludes)
+  await scanDir(root)
+
+  async function scanDir(dir: string) {
+    const names = await readdir(dir)
+    for (const name of names) {
+      const path = join(dir, name)
+      if (excludes.includes(path)) {
+        continue
+      }
+      const entry = await stat(path)
+      if (entry.isFile()) build(path)
+      else if (entry.isDirectory()) {
+        scanDir(path)
+      }
     }
   }
 }
@@ -27,7 +35,7 @@ function build(path: string) {
   writeFile(path.substring(0, path.length - 3), output, "utf8")
 }
 
-function compile(code: string, filename: string) {
+export function compile(code: string, filename: string) {
   return LiveScript.compile(code, {
     filename,
     header: false,

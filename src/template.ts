@@ -2,7 +2,7 @@ import tags from "html-tags"
 import voids from "html-tags/void"
 import { all as knownProperties } from "known-css-properties"
 import { readFileSync as readFile } from "fs"
-import { compile } from "./compile"
+import { compile } from "./build"
 
 const reserved = ["var", "continue"]
 

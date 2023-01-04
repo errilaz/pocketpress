@@ -6,11 +6,11 @@ const cwd = process.cwd()
 
 const parse = options({
   path: options.flag("p", "", cwd),
-  verbose: options.bit("v"),
+  exclude: options.list("e", ""),
   help: options.bit("h"),
 })
 
-const { path, verbose, help } = parse(process.argv.slice(2))
+const { path, exclude, help } = parse(process.argv.slice(2))
 
 const root = resolve(path!)
 
@@ -19,7 +19,13 @@ if (help) {
   process.exit(0)
 }
 
-scan(root!)
+const excludes = [
+  ...exclude,
+  ".git",
+  "node_modules",
+].map(dir => resolve(root, dir))
+
+scan(root!, excludes)
   .catch(e => { console.error(e); process.exit(1) })
 
 function usage() {
@@ -27,7 +33,6 @@ function usage() {
   
   Options:
     -p, --path <dir>      Path to site directory
-    -v, --verbose         Print extra information
     -h, --help            Display this message
 `)
 }
