@@ -15,8 +15,9 @@ PocketPress is an extremely limited SSG that produces HTML/CSS from a LiveScript
 - [ ] Page date
 - [ ] Maybe: Page authors
 - [ ] Nested CSS rules
+- [ ] Support `raw` and custom properties in `rule`
 - [ ] Generate `robots.txt` and `sitemap.xml`
 - [ ] Generate Atom `feed.xml` and JSONFeed `feed.json`
 - [ ] Merge properties with `style` attribute if both present
 - [ ] Produce human-readable markup
-- [ ] Use a child process with globals to replace local-vars templates (for speed)
+- [ ] Use a child process with globals to replace local-vars templates (for speed & `require` support)
