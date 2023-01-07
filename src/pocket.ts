@@ -1,6 +1,6 @@
 import options from "toptions"
 import { resolve } from "path"
-import { scan } from "./build"
+import { build } from "./build"
 
 const cwd = process.cwd()
 
@@ -25,7 +25,7 @@ const excludes = [
   "node_modules",
 ].map(dir => resolve(root, dir))
 
-scan(root!, excludes)
+build(root!, excludes)
   .catch(e => { console.error(e); process.exit(1) })
 
 function usage() {

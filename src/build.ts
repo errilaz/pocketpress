@@ -5,7 +5,8 @@ import { join } from "path"
 import { template } from "./template"
 import { writeFileSync as writeFile } from "fs"
 
-export async function scan(root: string, excludes: string[]) {
+export async function build(root: string, excludes: string[]) {
+  const files = []
   await scanDir(root)
 
   async function scanDir(dir: string) {
@@ -16,7 +17,11 @@ export async function scan(root: string, excludes: string[]) {
         continue
       }
       const entry = await stat(path)
-      if (entry.isFile()) build(path)
+      if (entry.isFile()) {
+        if (path.endsWith(".html.ls")) {
+          files.push(path)
+        }
+      }
       else if (entry.isDirectory()) {
         scanDir(path)
       }
@@ -26,7 +31,7 @@ export async function scan(root: string, excludes: string[]) {
 
 const doctype = "<!DOCTYPE html>"
 
-function build(path: string) {
+function buildHtml(path: string) {
   if (!path.endsWith(".html.ls")) return
   const result = template(path)
   const markup = result.page.toString()
