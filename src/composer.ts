@@ -40,7 +40,7 @@ function defineGlobals() {
 
   for (const property of properties) {
     const name = camelize(propertyName(property))
-    top[name] = Markup.property(name)
+    top[name] = Markup.property(property)
   }
 }
 
