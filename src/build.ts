@@ -1,12 +1,20 @@
 /// <reference path="livescript.d.ts" />
-import LiveScript from "livescript"
 import { readdir, stat } from "fs/promises"
 import { join } from "path"
-import { template } from "./template"
-import { writeFileSync as writeFile } from "fs"
+import { fork } from "child_process"
 
-export async function scan(root: string, excludes: string[]) {
+export async function build(root: string, excludes: string[]) {
+  const files: string[] = []
   await scanDir(root)
+  const composer = fork(join(__dirname, "composer"), {
+    stdio: "inherit"
+  })
+
+  composer.send(files)
+
+  await new Promise<void>(resolve => {
+    composer.on("close", () => resolve())
+  })
 
   async function scanDir(dir: string) {
     const names = await readdir(dir)
@@ -16,27 +24,14 @@ export async function scan(root: string, excludes: string[]) {
         continue
       }
       const entry = await stat(path)
-      if (entry.isFile()) build(path)
+      if (entry.isFile()) {
+        if (path.endsWith(".html.ls")) {
+          files.push(path)
+        }
+      }
       else if (entry.isDirectory()) {
-        scanDir(path)
+        await scanDir(path)
       }
     }
   }
-}
-
-const doctype = "<!DOCTYPE html>"
-
-function build(path: string) {
-  if (!path.endsWith(".html.ls")) return
-  const result = template(path)
-  const markup = result.page.toString()
-  const output = `${doctype}\n${markup}`
-  writeFile(path.substring(0, path.length - 3), output, "utf8")
-}
-
-export function compile(code: string, filename: string) {
-  return LiveScript.compile(code, {
-    filename,
-    header: false,
-  })
 }
