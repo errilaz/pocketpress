@@ -1,8 +1,9 @@
+/// <reference path="./livescript.d.ts" />
 import { resolve, dirname } from "path"
-import { template } from "./template"
 import { marked } from "marked"
 import { readFileSync as readFile } from "fs"
 import { Element, Property, Raw, Rule } from "./model"
+import { compile } from "livescript"
 
 module Markup {
   export function rule(selector: string, ...properties: Property[]) {
@@ -51,7 +52,7 @@ module Markup {
   export function includeFrom(context: string) {
     return function include(file: string) {
       const path = resolve(dirname(context), file)
-      return template(path)
+      return template(path)()
     }
   }
 
@@ -68,6 +69,18 @@ module Markup {
       const path = resolve(dirname(context), file)
       return readFile(path, "utf8")
     }
+  }
+
+  export function template(path: string) {
+    const contents = readFile(path, "utf8")
+    const ls = `return (
+include = include-from "${path}"
+load-file = load-file-from "${path}"
+${contents}
+)
+`
+    const js = compile(ls, { header: false, filename: path })
+    return () => eval(js)
   }
 }
 
