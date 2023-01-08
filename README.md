@@ -9,9 +9,10 @@ PocketPress is an extremely limited SSG that produces HTML/CSS from a LiveScript
 ## TODO
 
 - [x] Use a child process with globals to replace local-vars templates (for speed)
-- [ ] Separate HTML printing from markup model
-  - [ ] Produce human-readable markup
-  - [ ] Support `raw` and custom properties in `rule`
+- [x] Separate HTML printing from markup model
+  - [x] Produce human-readable markup
+- [ ] Perfect HTML printing
+- [ ] Support `raw` and custom properties in `rule`
 - [ ] Add `--verbose`
 - [ ] Docs
 - [ ] Tests
