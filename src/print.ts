@@ -18,17 +18,17 @@ function printNode(x: any, p: Printer) {
     case type === "number":
     case type === "boolean":
     case type === "bigint":
-      p.text += escape(x)
+      p.text += escape(x).replace(/\n/g, `\n${indent(p)}`)
       break
     case x instanceof Raw:
-      p.text += x.text
+      p.text += x.text.replace(/\n/g, `\n${indent(p)}`)
       break
     case Array.isArray(x):
       for (const e of x)
         printNode(e, p)
       break
     case x instanceof Element: {
-      p.text += `${indent(p)}<${x.tag}`
+      p.text += `<${x.tag}`
       const attributes = Object.keys(x.attributes)
         .map(key => `${key}="${x.attributes[key]}"`)
         .join(" ")
@@ -41,24 +41,27 @@ function printNode(x: any, p: Printer) {
       }
       p.text += ">\n"
       if (x.isVoid) {
+        p.text += indent(p)
         break
       }
       p.level++
+      p.text += indent(p)
       for (const child of x.children) {
         printNode(child, p)
       }
       p.level--
-      p.text += `\n${indent(p)}</${x.tag}>\n`
+      p.text += `\n${indent(p)}`
+      p.text += `</${x.tag}>\n${indent(p)}`
       break
     }
     case x instanceof Rule: {
-      p.text += `${indent(p)}${x.selector} {\n`
+      p.text += `${x.selector} {\n`
       p.level++
       p.text += Object.keys(x.properties)
         .map(key => `${indent(p)}${key}: ${x.properties[key]}`)
         .join(";\n")
       p.level--
-      p.text += `\n${indent(p)}}\n`
+      p.text += `\n${indent(p)}}\n${indent(p)}`
       break
     }
   }
