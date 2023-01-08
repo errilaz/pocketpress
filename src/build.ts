@@ -1,4 +1,3 @@
-/// <reference path="livescript.d.ts" />
 import { readdir, stat } from "fs/promises"
 import { join } from "path"
 import { fork } from "child_process"

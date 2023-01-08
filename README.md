@@ -14,11 +14,11 @@ PocketPress is an extremely limited SSG that produces HTML/CSS from a LiveScript
   - [ ] Support `raw` and custom properties in `rule`
 - [ ] Add `--verbose`
 - [ ] Docs
+- [ ] Tests
 - [ ] Tolerant building (skip & log broken pages)
 - [ ] Memoize template library
 - [ ] Page tags
 - [ ] Page date
-- [ ] Embed file properties, file tree, etc. into templates as data
 - [ ] Nested CSS rules
 - [ ] Generate `robots.txt` and `sitemap.xml`
 - [ ] Generate Atom `feed.xml` and JSONFeed `feed.json`
@@ -27,4 +27,3 @@ PocketPress is an extremely limited SSG that produces HTML/CSS from a LiveScript
 - [ ] Allow single file build
 - [ ] Page authors
 - [ ] `--watch` and simple live reload
-- [ ] Add known CSS keywords, colors, `url()`, functions, etc. to template DSL
