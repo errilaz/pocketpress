@@ -3,6 +3,7 @@ import voids from "html-tags/void"
 import { all as knownProperties } from "known-css-properties"
 import Markup from "./markup"
 import { writeFileSync as writeFile } from "fs"
+import { print } from "./print"
 
 const doctype = "<!DOCTYPE html>"
 
@@ -13,7 +14,7 @@ function compose(paths: string[]) {
   for (const path of paths) {
     const template = Markup.template(path)
     const result = template()
-    const markup = result.page.toString()
+    const markup = print(result.page)
     const output = `${doctype}\n${markup}`
     const target = path.substring(0, path.length - 3)
     writeFile(target, output, "utf8")

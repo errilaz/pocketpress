@@ -1,5 +1,3 @@
-import escape from "escape-html"
-
 export class Element {
   tag: string
   isVoid: boolean
@@ -39,31 +37,8 @@ export class Element {
       }
     }
     else {
-      this.children.push(escape(content.toString()))
+      this.children.push(content.toString())
     }
-  }
-
-  toString() {
-    let output = `<${this.tag}`
-    const attributes = Object.keys(this.attributes)
-      .map(key => `${key}="${this.attributes[key]}"`)
-      .join(" ")
-    if (attributes.length > 0) output += " " + attributes
-    const properties = Object.keys(this.properties)
-      .map(key => `${key}: ${this.properties[key]}`)
-      .join("; ")
-    if (properties.length > 0) {
-      output += ` style="${properties}"`
-    }
-    output += ">"
-    if (this.isVoid) {
-      return output
-    }
-    for (const child of this.children) {
-      output += child.toString()
-    }
-    output += `</${this.tag}>`
-    return output
   }
 }
 
@@ -91,15 +66,6 @@ export class Rule {
   add(property: Property) {
     this.properties[property.name] = property.value
   }
-
-  toString() {
-    let output = `${this.selector} { `
-    output += Object.keys(this.properties)
-      .map(key => `${key}: ${this.properties[key]}`)
-      .join("; ")
-    output += " } "
-    return output
-  }
 }
 
 export class Raw {
@@ -107,10 +73,6 @@ export class Raw {
 
   constructor(object: any) {
     this.text = object === null || object === undefined ? "" : object.toString()
-  }
-
-  toString() {
-    return this.text
   }
 }
 
