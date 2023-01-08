@@ -83,7 +83,7 @@ All HTML elements and CSS properties should work except `var` and `continue` whi
 
 `raw` includes un-escaped HTML content.
 
-`markdown` includes markdown using the `marked` library:
+`markdown` includes markdown using the [marked](https://marked.js.org) library:
 
 ```ls
 markdown """
