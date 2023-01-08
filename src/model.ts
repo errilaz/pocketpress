@@ -1,8 +1,10 @@
+/** Site build configuration. */
 export interface SiteBuild {
   root: string
   templates: string[]
 }
 
+/** Representation of an HTML element. */
 export class Element {
   tag: string
   isVoid: boolean
@@ -47,6 +49,7 @@ export class Element {
   }
 }
 
+/** Representation of a CSS property/value. */
 export class Property {
   name: string
   value: string
@@ -57,6 +60,7 @@ export class Property {
   }
 }
 
+/** Representation of a CSS rule. */
 export class Rule {
   selector: string
   properties: { [name: string]: string } = {}
@@ -73,6 +77,7 @@ export class Rule {
   }
 }
 
+/** Unescaped HTML content. */
 export class Raw {
   text: string
 

@@ -1,14 +1,17 @@
 import escape from "escape-html"
 import { Element, Raw, Rule } from "./model"
 
+/** State for `print`. */
 interface Printer { text: string, level: number }
 
+/** Pretty print HTML content. */
 export function print(x: any) {
   const printer = { text: "", level: 0 }
   printNode(x, printer)
   return printer.text
 }
 
+/** Add an artifact to the `Printer`. */
 function printNode(x: any, p: Printer) {
   const type = typeof x
   switch (true) {
@@ -67,6 +70,7 @@ function printNode(x: any, p: Printer) {
   }
 }
 
+/** Returns necessary indentation spaces based on `Printer` state. */
 function indent(p: Printer) {
   let s = ""
   for (let i = 0; i < p.level; i++) {

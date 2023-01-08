@@ -5,11 +5,14 @@ import { readFileSync as readFile } from "fs"
 import { Element, Property, Raw, Rule } from "./model"
 import { compile } from "livescript"
 
+/** Functions for the template DSL. */
 module Markup {
+  /** Constructs a CSS rule. */
   export function rule(selector: string, ...properties: Property[]) {
     return new Rule(selector, properties)
   }
 
+  /** Factory for Element instances with CSS class name proxies wrapping them. */
   export function element(tag: string, isVoid: boolean) {
     return new Proxy(createElement, { get: withClass })
 
@@ -43,12 +46,14 @@ module Markup {
     }
   }
 
+  /** Factory for Property-returning functions. */
   export function property(name: string) {
     return function property(value: any) {
       return new Property(name, value)
     }
   }
 
+  /** Factory for `include` functions. */
   export function includeFrom(context: string, root: string) {
     return function include(file: string) {
       const path = siteResolve(context, file, root)
@@ -56,14 +61,17 @@ module Markup {
     }
   }
 
+  /** Returns an instance of Raw. */
   export function raw(object: any) {
     return new Raw(object)
   }
 
+  /** Parses markdown and returns a Raw containing the HTML. */
   export function markdown(markdown: string) {
     return new Raw(marked.parse(markdown))
   }
 
+  /** Factory for `load-file` functions. */
   export function loadFileFrom(context: string, root: string) {
     return function loadFile(file: string) {
       const path = siteResolve(context, file, root)
@@ -71,6 +79,7 @@ module Markup {
     }
   }
 
+  /** Compile a template and return a function which runs it. */
   export function template(path: string, root: string) {
     const contents = readFile(path, "utf8")
     const ls = `return (
@@ -86,10 +95,12 @@ ${contents}
 
 export default Markup
 
+/** Transform camelCase name into kebab-case. */
 function kebabize(camel: string) {
   return camel.replace(/[A-Z]/g, c => "-" + c.toLowerCase());
 }
 
+/** Resolve root-relative and file-relative paths. */
 function siteResolve(context: string, file: string, root: string) {
   if (file.startsWith("~/")) {
     return join(root, file.substring(2))

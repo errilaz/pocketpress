@@ -10,6 +10,7 @@ const doctype = "<!DOCTYPE html>"
 
 process.on("message", (site: SiteBuild) => compose(site))
 
+/** Receives build configuration from `build.ts` and runs the templates, producing markup. */
 function compose(site: SiteBuild) {
   defineGlobals()
   for (const path of site.templates) {
@@ -23,9 +24,13 @@ function compose(site: SiteBuild) {
   process.exit(0)
 }
 
+/** Clashes with LS/JS names. */
 const reserved = ["var", "continue"]
+
+/** Disable epub properties (for now). */
 const properties = knownProperties.filter(p => !p.startsWith("epub"))
 
+/** Creates global variables for functions to create HTML elements and CSS properties. */
 function defineGlobals() {
   const top = global as any
   top.rule = Markup.rule
@@ -46,6 +51,7 @@ function defineGlobals() {
   }
 }
 
+/** Formats a property variable name. */
 function propertyName(property: string) {
   switch (true) {
     case reserved.includes(property):
@@ -56,6 +62,7 @@ function propertyName(property: string) {
   return property
 }
 
+/** Turn a kebab-case name into camelCase. */
 function camelize(kebab: string) {
   return kebab.replace(/-[a-z]/g, ([, c]) => c.toUpperCase());
 }
