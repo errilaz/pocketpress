@@ -1,3 +1,8 @@
+export interface SiteBuild {
+  root: string
+  templates: string[]
+}
+
 export class Element {
   tag: string
   isVoid: boolean

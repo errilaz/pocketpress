@@ -3,13 +3,13 @@ import { join } from "path"
 import { fork } from "child_process"
 
 export async function build(root: string, excludes: string[]) {
-  const files: string[] = []
+  const templates: string[] = []
   await scanDir(root)
   const composer = fork(join(__dirname, "composer"), {
     stdio: "inherit"
   })
 
-  composer.send(files)
+  composer.send({ root, templates })
 
   await new Promise<void>(resolve => {
     composer.on("close", () => resolve())
@@ -25,7 +25,7 @@ export async function build(root: string, excludes: string[]) {
       const entry = await stat(path)
       if (entry.isFile()) {
         if (path.endsWith(".html.ls")) {
-          files.push(path)
+          templates.push(path)
         }
       }
       else if (entry.isDirectory()) {

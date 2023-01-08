@@ -4,15 +4,16 @@ import { all as knownProperties } from "known-css-properties"
 import Markup from "./markup"
 import { writeFileSync as writeFile } from "fs"
 import { print } from "./print"
+import { SiteBuild } from "./model"
 
 const doctype = "<!DOCTYPE html>"
 
-process.on("message", (paths: string[]) => compose(paths))
+process.on("message", (site: SiteBuild) => compose(site))
 
-function compose(paths: string[]) {
+function compose(site: SiteBuild) {
   defineGlobals()
-  for (const path of paths) {
-    const template = Markup.template(path)
+  for (const path of site.templates) {
+    const template = Markup.template(path, site.root)
     const result = template()
     const markup = print(result.page)
     const output = `${doctype}\n${markup}`

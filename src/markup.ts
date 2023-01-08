@@ -1,5 +1,5 @@
 /// <reference path="./livescript.d.ts" />
-import { resolve, dirname } from "path"
+import { resolve, dirname, join } from "path"
 import { marked } from "marked"
 import { readFileSync as readFile } from "fs"
 import { Element, Property, Raw, Rule } from "./model"
@@ -49,10 +49,10 @@ module Markup {
     }
   }
 
-  export function includeFrom(context: string) {
+  export function includeFrom(context: string, root: string) {
     return function include(file: string) {
-      const path = resolve(dirname(context), file)
-      return template(path)()
+      const path = siteResolve(context, file, root)
+      return template(path, root)()
     }
   }
 
@@ -64,18 +64,18 @@ module Markup {
     return new Raw(marked.parse(markdown))
   }
 
-  export function loadFileFrom(context: string) {
+  export function loadFileFrom(context: string, root: string) {
     return function loadFile(file: string) {
-      const path = resolve(dirname(context), file)
+      const path = siteResolve(context, file, root)
       return readFile(path, "utf8")
     }
   }
 
-  export function template(path: string) {
+  export function template(path: string, root: string) {
     const contents = readFile(path, "utf8")
     const ls = `return (
-include = include-from "${path}"
-load-file = load-file-from "${path}"
+include = include-from "${path}", "${root}"
+load-file = load-file-from "${path}", "${root}"
 ${contents}
 )
 `
@@ -86,6 +86,13 @@ ${contents}
 
 export default Markup
 
-export function kebabize(camel: string) {
+function kebabize(camel: string) {
   return camel.replace(/[A-Z]/g, c => "-" + c.toLowerCase());
+}
+
+function siteResolve(context: string, file: string, root: string) {
+  if (file.startsWith("~/")) {
+    return join(root, file.substring(2))
+  }
+  return resolve(dirname(context), file)
 }
