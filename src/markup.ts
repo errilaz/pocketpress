@@ -1,5 +1,5 @@
-/// <reference path="./livescript.d.ts" />
-import { resolve, dirname, join } from "path"
+/// <reference path="./types.d.ts" />
+import { resolve, dirname, join, relative } from "path"
 import { marked } from "marked"
 import { readFileSync as readFile } from "fs"
 import { Element, Property, Raw, Rule } from "./model"
@@ -85,11 +85,20 @@ module Markup {
     const ls = `return (
 include = include-from "${path}", "${root}"
 load-file = load-file-from "${path}", "${root}"
+live-reload = live-reload-from "${path}", "${root}"
 ${contents}
 )
 `
     const js = compile(ls, { header: false, filename: path })
     return () => eval(js)
+  }
+
+  export function liveReloadFrom(context: string, root: string) {
+    const src = `${relative(context, root)}/.live-reload.js`
+    return () => new Raw(`
+      <script>window.LIVE_RELOAD_SRC = "${src}"</script>
+      <script src="${src}"></script>
+    `)
   }
 }
 

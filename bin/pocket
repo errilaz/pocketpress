@@ -1,7 +1,7 @@
 #!/bin/bash
 POCKET=$(realpath "$(dirname $(readlink -f $BASH_SOURCE))/..")
 if [[ $POCKET_DEV = "true" ]]; then
-  "$POCKET/node_modules/.bin/ts-node" "$POCKET/src/pocket.ts" "$@"
+  "$POCKET/node_modules/.bin/ts-node" -P "$POCKET/tsconfig.json" "$POCKET/src/pocket.ts" "$@"
 else
   node "$POCKET/lib/pocket.js" "$@"
 fi

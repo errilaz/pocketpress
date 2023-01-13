@@ -1,20 +1,32 @@
 import { readdir, stat } from "fs/promises"
 import { join } from "path"
-import { fork } from "child_process"
+import { ChildProcess, fork } from "child_process"
 
 /** Scans the site directory, collecting template paths and sending them to spawned composer process. */
-export async function build(root: string, excludes: string[]) {
+export async function build(root: string, watch: boolean, excludes: string[], composer?: ChildProcess) {
   const templates: string[] = []
   await scanDir(root)
-  const composer = fork(join(__dirname, "composer"), {
-    stdio: "inherit"
-  })
 
-  composer.send({ root, templates })
+  if (!composer) {
+    composer = fork(join(__dirname, "composer"), {
+      stdio: "inherit"
+    })
+  }
 
-  await new Promise<void>(resolve => {
-    composer.on("close", () => resolve())
-  })
+  composer.send({ root, watch, templates })
+
+  if (!watch) {
+    await new Promise<void>(resolve => {
+      composer!.on("close", () => resolve())
+    })
+  }
+  else {
+    await new Promise<void>(resolve => {
+      composer!.on("message", () => resolve())
+    })
+  }
+
+  return composer
 
   /** Recursively look for `.html.ls` files. */
   async function scanDir(dir: string) {

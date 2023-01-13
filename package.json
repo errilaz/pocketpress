@@ -27,6 +27,7 @@
     }
   },
   "dependencies": {
+    "chokidar": "^3.5.3",
     "escape-html": "^1.0.3",
     "html-tags": "^3.2.0",
     "known-css-properties": "^0.26.0",

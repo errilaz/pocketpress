@@ -11,17 +11,22 @@ const doctype = "<!DOCTYPE html>"
 process.on("message", (site: SiteBuild) => compose(site))
 
 /** Receives build configuration from `build.ts` and runs the templates, producing markup. */
-function compose(site: SiteBuild) {
+function compose({ root, templates, watch }: SiteBuild) {
   defineGlobals()
-  for (const path of site.templates) {
-    const template = Markup.template(path, site.root)
+  for (const path of templates) {
+    const template = Markup.template(path, root)
     const result = template()
     const markup = print(result.page)
     const output = `${doctype}\n${markup}`
     const target = path.substring(0, path.length - 3)
     writeFile(target, output, "utf8")
   }
-  process.exit(0)
+  if (!watch) {
+    process.exit(0)
+  }
+  else {
+    process.send!("done")
+  }
 }
 
 /** Clashes with LS/JS names. */
