@@ -1,8 +1,8 @@
-/// <reference path="./livescript.d.ts" />
-import { resolve, dirname, join } from "path"
+/// <reference path="./types.d.ts" />
+import { resolve, dirname, join, relative } from "path"
 import { marked } from "marked"
 import { readFileSync as readFile } from "fs"
-import { Element, Property, Raw, Rule } from "./model"
+import { Element, Property, Raw, Rule, SiteBuild } from "./model"
 import { compile } from "livescript"
 
 /** Functions for the template DSL. */
@@ -54,10 +54,10 @@ module Markup {
   }
 
   /** Factory for `include` functions. */
-  export function includeFrom(context: string, root: string) {
+  export function includeFrom(context: string, site: SiteBuild) {
     return function include(file: string) {
-      const path = siteResolve(context, file, root)
-      return template(path, root)()
+      const path = siteResolve(context, file, site.root)
+      return template(path, site)()
     }
   }
 
@@ -80,16 +80,27 @@ module Markup {
   }
 
   /** Compile a template and return a function which runs it. */
-  export function template(path: string, root: string) {
+  export function template(path: string, site: SiteBuild) {
     const contents = readFile(path, "utf8")
     const ls = `return (
-include = include-from "${path}", "${root}"
-load-file = load-file-from "${path}", "${root}"
+site = ${JSON.stringify(site)}
+include = include-from "${path}", site
+load-file = load-file-from "${path}", "${site.root}"
+live-reload = live-reload-from "${site.root}", ${site.watch}
 ${contents}
 )
 `
     const js = compile(ls, { header: false, filename: path })
     return () => eval(js)
+  }
+
+  export function liveReloadFrom(root: string, enable: boolean) {
+    if (!enable) return () => false
+    const src = "file://" + join(root, ".live-reload.js")
+    return () => new Raw(`
+      <script>window.LIVE_RELOAD_SRC = "${src}"</script>
+      <script src="${src}"></script>
+    `)
   }
 }
 

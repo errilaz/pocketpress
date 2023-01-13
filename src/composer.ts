@@ -14,14 +14,20 @@ process.on("message", (site: SiteBuild) => compose(site))
 function compose(site: SiteBuild) {
   defineGlobals()
   for (const path of site.templates) {
-    const template = Markup.template(path, site.root)
+    const template = Markup.template(path, site)
     const result = template()
     const markup = print(result.page)
     const output = `${doctype}\n${markup}`
     const target = path.substring(0, path.length - 3)
     writeFile(target, output, "utf8")
   }
-  process.exit(0)
+
+  if (site.watch) {
+    process.send!("done")
+  }
+  else {
+    process.exit(0)
+  }
 }
 
 /** Clashes with LS/JS names. */
