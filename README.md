@@ -6,9 +6,17 @@ PocketPress is a little SSG that produces HTML/CSS from a [LiveScript](https://l
 
 ## Usage
 
-`pocket [-p dir]`
+```
+Usage: pocket [options]
+  
+  Options:
+    -p, --path <dir>      Path to site directory
+    -e, --exclude <dir>   Ignore directory
+    -w, --watch           Enter watch mode
+    -h, --help            Display this message
+```
 
-This scans a directory tree and transforms `.html.ls` template files into `.html` files.
+Scans a directory tree and transforms `.html.ls` template files into `.html` files.
 
 ## Templates
 
@@ -74,6 +82,10 @@ page: layout do
 ```
 
 `include` understands `~/` at the beginning of the path as relative to the site root.
+
+## Watch mode
+
+`live-reload!` embeds a script tag in watch mode which will check and reload pages. This is meant to be used with local `file:///` URLs as embedding a web server for this feature seemed excessive. If this is used, please add `.live-reload.js` to your source control ignore file.
 
 ## Additional functions
 

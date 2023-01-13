@@ -42,6 +42,7 @@ function usage() {
   Options:
     -p, --path <dir>      Path to site directory
     -e, --exclude <dir>   Ignore directory
+    -w, --watch           Enter watch mode
     -h, --help            Display this message
 `)
 }
