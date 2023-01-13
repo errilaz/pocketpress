@@ -86,7 +86,7 @@ module Markup {
 site = ${JSON.stringify(site)}
 include = include-from "${path}", site
 load-file = load-file-from "${path}", "${site.root}"
-live-reload = live-reload-from "${path}", "${site.root}", ${site.watch}
+live-reload = live-reload-from "${site.root}", ${site.watch}
 ${contents}
 )
 `
@@ -94,9 +94,9 @@ ${contents}
     return () => eval(js)
   }
 
-  export function liveReloadFrom(context: string, root: string, enable: boolean) {
+  export function liveReloadFrom(root: string, enable: boolean) {
     if (!enable) return () => false
-    const src = `${relative(context, root)}/.live-reload.js`
+    const src = "file://" + join(root, ".live-reload.js")
     return () => new Raw(`
       <script>window.LIVE_RELOAD_SRC = "${src}"</script>
       <script src="${src}"></script>
