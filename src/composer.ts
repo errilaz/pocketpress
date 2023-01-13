@@ -21,11 +21,12 @@ function compose(site: SiteBuild) {
     const target = path.substring(0, path.length - 3)
     writeFile(target, output, "utf8")
   }
-  if (!site.watch) {
-    process.exit(0)
+
+  if (site.watch) {
+    process.send!("done")
   }
   else {
-    process.send!("done")
+    process.exit(0)
   }
 }
 

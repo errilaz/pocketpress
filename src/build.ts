@@ -15,16 +15,9 @@ export async function build(root: string, watch: boolean, excludes: string[], co
 
   composer.send({ root, watch, templates })
 
-  if (!watch) {
-    await new Promise<void>(resolve => {
-      composer!.on("close", () => resolve())
-    })
-  }
-  else {
-    await new Promise<void>(resolve => {
-      composer!.on("message", () => resolve())
-    })
-  }
+  await new Promise<void>(resolve => {
+    composer!.on(watch ? "message" : "close", () => resolve())
+  })
 
   return composer
 
