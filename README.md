@@ -37,13 +37,17 @@ All HTML elements are pre-defined functions.
 
 ## Styles
 
-Style tags can use the `rule` function:
+Style tags can use the `rule` and `media` block functions, and custom properties with `prop`:
 
 ```ls
 style do
   rule ".red-bold",
     color "red"
     font-weight bold
+  media "(prefers-color-scheme: dark)",
+    rule ":root",
+      prop "--fg" "white"
+      prop "--bg" "black"
 ```
 
 You can apply classes directly to the element functions:
@@ -63,13 +67,22 @@ div do
 
 ## Layouts & Partials
 
-Layouts and partials can be defined as `.ls` files ending in a function:
+Layouts and partials can be defined as `.ls` files:
 
+`layout.ls`
 ```ls
-(_content) ->
-  html body do
-    "My Site"
-    main _content
+(_title, _content) ->
+  html do
+    head
+      title _title
+    body do
+      "My Site"
+      main _content
+```
+
+`partial.ls`
+```ls
+p "this is a partial!"
 ```
 
 and used within a `.html.ls` file with `include`:
@@ -77,8 +90,9 @@ and used within a `.html.ls` file with `include`:
 ```ls
 layout = include "layout.ls"
 
-page: layout do
-  "my page!"
+page: layout "My Page",
+  "this is my page!"
+  include "partial.ls"
 ```
 
 `include` understands `~/` at the beginning of the path as relative to the site root.
@@ -102,5 +116,13 @@ markdown """
   - this is a
   - simple
   - list!
+"""
+```
+
+`livescript` embeds a script tag with compiled LiveScript:
+
+```ls
+livescript """
+  console.log \hello
 """
 ```
