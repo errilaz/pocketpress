@@ -7,7 +7,7 @@ PocketPress is a little SSG that produces HTML/CSS from a [LiveScript](https://l
 ## Usage
 
 ```
-Usage: pocket [options]
+pocket [options]
   
   Options:
     -p, --path <dir>      Path to site directory

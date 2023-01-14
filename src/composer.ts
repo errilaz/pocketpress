@@ -56,9 +56,6 @@ function defineGlobals() {
   top.prop = Markup.prop
   top.media = Markup.media
   top.markdown = Markup.markdown
-  top.includeFrom = Markup.includeFrom
-  top.loadFileFrom = Markup.loadFileFrom
-  top.liveReloadFrom = Markup.liveReloadFrom
   top.livescript = Markup.livescript
 
   for (const tag of tags) {
