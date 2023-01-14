@@ -115,4 +115,5 @@ function isChild(x: any) {
     || x instanceof Element
     || x instanceof Rule
     || x instanceof Raw
+    || x instanceof MediaQuery
 }

@@ -68,7 +68,7 @@ function printNode(x: any, p: Printer) {
       break
     }
     case x instanceof MediaQuery: {
-      p.text += `@media ${x.query} {\n}`
+      p.text += `@media ${x.query} {\n`
       p.level++
       p.text += indent(p)
       for (const rule of x.rules) {
