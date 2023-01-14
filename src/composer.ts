@@ -14,12 +14,24 @@ process.on("message", (site: SiteBuild) => compose(site))
 function compose(site: SiteBuild) {
   defineGlobals()
   for (const path of site.templates) {
-    const template = Markup.template(path, site)
-    const result = template()
-    const markup = print(result.page)
-    const output = `${doctype}\n${markup}`
-    const target = path.substring(0, path.length - 3)
-    writeFile(target, output, "utf8")
+    try {
+      const template = Markup.template(path, site)
+      const result = template()
+      const markup = print(result.page)
+      const output = `${doctype}\n${markup}`
+      const target = path.substring(0, path.length - 3)
+      writeFile(target, output, "utf8")
+    }
+    catch (e) {
+      if (!(e instanceof Error)) {
+        console.error(`Error in ${path}:`, e)
+        continue
+      }
+      console.error(`Error in "${path}":`, e.message)
+      if (!site.watch) {
+        process.exit(1)
+      }
+    }
   }
 
   if (site.watch) {
