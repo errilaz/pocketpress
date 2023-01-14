@@ -1,7 +1,7 @@
 import tags from "html-tags"
 import voids from "html-tags/void"
 import { all as knownProperties } from "known-css-properties"
-import Markup from "./markup"
+import { Markup } from "./markup"
 import { writeFileSync as writeFile } from "fs"
 import { print } from "./print"
 import { SiteBuild } from "./model"
@@ -53,9 +53,13 @@ function defineGlobals() {
   const top = global as any
   top.rule = Markup.rule
   top.raw = Markup.raw
+  top.prop = Markup.prop
+  top.media = Markup.media
   top.markdown = Markup.markdown
   top.includeFrom = Markup.includeFrom
   top.loadFileFrom = Markup.loadFileFrom
+  top.liveReloadFrom = Markup.liveReloadFrom
+  top.livescript = Markup.livescript
 
   for (const tag of tags) {
     const isVoid = (voids as string[]).includes(tag)

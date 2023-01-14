@@ -78,6 +78,22 @@ export class Rule {
   }
 }
 
+export class MediaQuery {
+  query: string
+  rules: Rule[] = []
+
+  constructor(query: string, rules: Rule[]) {
+    this.query = query
+    for (const rule of rules) {
+      this.add(rule)
+    }
+  }
+
+  add(rule: Rule) {
+    this.rules.push(rule)
+  }
+}
+
 /** Unescaped HTML content. */
 export class Raw {
   text: string

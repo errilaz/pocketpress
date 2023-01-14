@@ -1,5 +1,5 @@
 import escape from "escape-html"
-import { Element, Raw, Rule } from "./model"
+import { Element, MediaQuery, Raw, Rule } from "./model"
 
 /** State for `print`. */
 interface Printer { text: string, level: number }
@@ -63,6 +63,17 @@ function printNode(x: any, p: Printer) {
       p.text += Object.keys(x.properties)
         .map(key => `${indent(p)}${key}: ${x.properties[key]}`)
         .join(";\n")
+      p.level--
+      p.text += `\n${indent(p)}}\n${indent(p)}`
+      break
+    }
+    case x instanceof MediaQuery: {
+      p.text += `@media ${x.query} {\n}`
+      p.level++
+      p.text += indent(p)
+      for (const rule of x.rules) {
+        printNode(rule, p)
+      }
       p.level--
       p.text += `\n${indent(p)}}\n${indent(p)}`
       break

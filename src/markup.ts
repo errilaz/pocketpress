@@ -1,12 +1,21 @@
 /// <reference path="./types.d.ts" />
-import { resolve, dirname, join, relative } from "path"
+import { resolve, dirname, join } from "path"
 import { marked } from "marked"
 import { readFileSync as readFile } from "fs"
-import { Element, Property, Raw, Rule, SiteBuild } from "./model"
-import { compile } from "livescript"
+import { Element, MediaQuery, Property, Raw, Rule, SiteBuild } from "./model"
+import { compile, CompileOptions } from "livescript"
+import { run } from "./run"
 
 /** Functions for the template DSL. */
-module Markup {
+export module Markup {
+  /** Compile a template and return a function which runs it. */
+  export function template(path: string, site: SiteBuild) {
+    const contents = readFile(path, "utf8")
+    const ls = `return (${contents})`
+    const js = compile(ls, { header: false, filename: path })
+    return () => run(js, path, site)
+  }
+
   /** Constructs a CSS rule. */
   export function rule(selector: string, ...properties: Property[]) {
     return new Rule(selector, properties)
@@ -53,6 +62,16 @@ module Markup {
     }
   }
 
+  /** Custom property helper. */
+  export function prop(name: string, value: any) {
+    return new Property(name, value)
+  }
+
+  /** Creates a media query. */
+  export function media(query: string, ...rules: Rule[]) {
+    return new MediaQuery(query, rules)
+  }
+
   /** Factory for `include` functions. */
   export function includeFrom(context: string, site: SiteBuild) {
     return function include(file: string) {
@@ -61,7 +80,7 @@ module Markup {
     }
   }
 
-  /** Returns an instance of Raw. */
+  /** Creates an instance of Raw. */
   export function raw(object: any) {
     return new Raw(object)
   }
@@ -79,21 +98,6 @@ module Markup {
     }
   }
 
-  /** Compile a template and return a function which runs it. */
-  export function template(path: string, site: SiteBuild) {
-    const contents = readFile(path, "utf8")
-    const ls = `return (
-site = ${JSON.stringify(site)}
-include = include-from "${path}", site
-load-file = load-file-from "${path}", "${site.root}"
-live-reload = live-reload-from "${site.root}", ${site.watch}
-${contents}
-)
-`
-    const js = compile(ls, { header: false, filename: path })
-    return () => eval(js)
-  }
-
   export function liveReloadFrom(root: string, enable: boolean) {
     if (!enable) return () => false
     const src = "file://" + join(root, ".live-reload.js")
@@ -102,9 +106,18 @@ ${contents}
       <script src="${src}"></script>
     `)
   }
-}
 
-export default Markup
+  export function livescript(code: string): Element;
+  export function livescript(options: CompileOptions, code: string): Element;
+  export function livescript(options: CompileOptions | string, code?: string): Element {
+    if (code === undefined) {
+      code = options as string
+      options = {}
+    }
+    options = { header: false, ...options as CompileOptions } 
+    return new Element("script", false, [raw(compile(code, options))])
+  }
+}
 
 /** Transform camelCase name into kebab-case. */
 function kebabize(camel: string) {
