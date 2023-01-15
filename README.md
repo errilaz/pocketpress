@@ -4,6 +4,16 @@
 
 PocketPress is a little SSG that produces HTML/CSS from a [LiveScript](https://livescript.net)-based DSL. It is meant to create simple sites quickly, typically hosted on GitHub pages.
 
+## Install
+
+```sh 
+npm install pocketpress
+# or
+pnpm add pocketpress
+# or
+yarn add pocketpress
+```
+
 ## Usage
 
 ```
@@ -33,7 +43,7 @@ page:
         td "another cell"
 ```
 
-All HTML elements are pre-defined functions.
+All HTML elements are pre-defined functions. The `var` element is called `_var` to work with JS syntax.
 
 ## Styles
 
@@ -50,11 +60,18 @@ style do
       prop "--bg" "black"
 ```
 
+All CSS properties are pre-defined functions. The `continue` property is called `_continue` to work with JS syntax.
+
+## Class Sugar
+
 You can apply classes directly to the element functions:
 
 ```ls
 div.red-bold "this is bold and red!"
+div.red-bold.also-italic "this has two classes!"
 ```
+
+## Inline Styles
 
 You can also use CSS properties directly on elements:
 
@@ -101,15 +118,9 @@ page: layout "My Page",
 
 `live-reload!` embeds a script tag in watch mode which will check and reload pages. This is meant to be used with local `file:///` URLs as embedding a web server for this feature seemed excessive. If this is used, please add `.live-reload.js` to your source control ignore file.
 
-## Additional functions
+## Markdown
 
-All HTML elements and CSS properties should work except `var` and `continue` which become `_var` and `_continue`.
-
-`load-file` synchronously reads a file relative to the current file. You can use `~/` at the start of the path to refer to the site root.
-
-`raw` includes un-escaped HTML content.
-
-`markdown` includes markdown using the [marked](https://marked.js.org) library:
+Markdown can be embedded (uses the fast [marked](https://marked.js.org) library):
 
 ```ls
 markdown """
@@ -119,6 +130,8 @@ markdown """
 """
 ```
 
+## LiveScript client side
+
 `livescript` embeds a script tag with compiled LiveScript:
 
 ```ls
@@ -126,3 +139,12 @@ livescript """
   console.log \hello
 """
 ```
+
+## Other features
+
+`raw` includes un-escaped HTML content.
+
+`elem` creates a custom element with the given tag and contents.
+
+`load-file` synchronously reads a file relative to the current file. You can use `~/` at the start of the path to refer to the site root.
+

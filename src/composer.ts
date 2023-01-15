@@ -51,9 +51,10 @@ const properties = knownProperties.filter(p => !p.startsWith("epub"))
 /** Creates global variables for functions to create HTML elements and CSS properties. */
 function defineGlobals() {
   const top = global as any
-  top.rule = Markup.rule
   top.raw = Markup.raw
   top.prop = Markup.prop
+  top.elem = Markup.elem
+  top.rule = Markup.rule
   top.media = Markup.media
   top.markdown = Markup.markdown
   top.livescript = Markup.livescript

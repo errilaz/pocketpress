@@ -62,6 +62,11 @@ export module Markup {
     }
   }
 
+  /** Custom element helper. */
+  export function elem(tag: string, ...contents: any[]) {
+    return new Element(tag, false, contents)
+  }
+
   /** Custom property helper. */
   export function prop(name: string, value: any) {
     return new Property(name, value)
