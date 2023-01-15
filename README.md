@@ -2,7 +2,7 @@
 
 > An extremely static site generator
 
-PocketPress is a little SSG that produces HTML/CSS from a [LiveScript](https://livescript.net)-based DSL. It is meant to create simple sites quickly, typically hosted on GitHub pages.
+PocketPress is a little zero-config SSG that produces HTML/CSS from a [LiveScript](https://livescript.net)-based DSL. It is meant to create simple sites quickly, typically hosted on GitHub pages.
 
 ## Install
 
@@ -114,7 +114,7 @@ page: layout "My Page",
 
 `include` understands `~/` at the beginning of the path as relative to the site root.
 
-## Watch mode
+## Live Reload
 
 `live-reload!` embeds a script tag in watch mode which will check and reload pages. This is meant to be used with local `file:///` URLs as embedding a web server for this feature seemed excessive. If this is used, please add `.live-reload.js` to your source control ignore file.
 
