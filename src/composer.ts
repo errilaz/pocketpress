@@ -17,8 +17,9 @@ function compose(site: SiteBuild) {
     try {
       const template = Markup.template(path, site)
       const result = template()
-      const markup = print(result.page)
-      const output = `${doctype}\n${markup}`
+      const isHtml = path.endsWith(".html.ls")
+      const markup = print(isHtml ? result.page : result, !isHtml)
+      const output = isHtml ? `${doctype}\n${markup}` : markup
       const target = path.substring(0, path.length - 3)
       writeFile(target, output, "utf8")
     }
@@ -58,6 +59,7 @@ function defineGlobals() {
   top.media = Markup.media
   top.markdown = Markup.markdown
   top.livescript = Markup.livescript
+  top.document = Markup.document
 
   for (const tag of tags) {
     const isVoid = (voids as string[]).includes(tag)

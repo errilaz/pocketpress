@@ -118,7 +118,7 @@ page: layout "My Page",
 
 `live-reload!` embeds a script tag in watch mode which will check and reload pages. This is meant to be used with local `file:///` URLs as embedding a web server for this feature seemed excessive. If this is used, please add `.live-reload.js` to your source control ignore file.
 
-## Markdown
+## Embedded Markdown
 
 Markdown can be embedded (uses the fast [marked](https://marked.js.org) library):
 
@@ -148,3 +148,22 @@ livescript """
 
 `load-file` synchronously reads a file relative to the current file. You can use `~/` at the start of the path to refer to the site root.
 
+## Markdown Document Generator
+
+Standalone `.md` documents can also be generated with `.md.ls` files. This is useful for READMEs containing repeated content or complex tables.
+
+The `page:` property is not used, instead use the `document` function:
+
+```ls
+dont-repeat-yourself = "something you want to embed over and over"
+
+document do
+  raw """
+    # My Project
+  """
+  table tbody do
+    tr do
+      td "easy to maintain tables"
+      td dont-repeat-yourself
+      td dont-repeat-yourself
+```
