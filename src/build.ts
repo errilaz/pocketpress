@@ -31,7 +31,7 @@ export async function build(root: string, watch: boolean, excludes: string[], co
       }
       const entry = await stat(path)
       if (entry.isFile()) {
-        if (path.endsWith(".html.ls")) {
+        if (path.endsWith(".html.ls") || path.endsWith(".md.ls")) {
           templates.push(path)
         }
       }

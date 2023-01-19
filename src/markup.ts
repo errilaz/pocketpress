@@ -122,6 +122,12 @@ export module Markup {
     options = { header: false, ...options as CompileOptions } 
     return new Element("script", false, [raw(compile(code, options))])
   }
+
+  /** Concatenate contents for markdown generation. */
+  export function document(...contents: any[]) {
+    return contents.reduce((contents, content) =>
+      [...contents, raw("\n\n"), content], [])
+  }
 }
 
 /** Transform camelCase name into kebab-case. */
