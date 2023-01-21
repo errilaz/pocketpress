@@ -4,7 +4,7 @@ import { all as knownProperties } from "known-css-properties"
 import { Markup } from "./markup"
 import { writeFileSync as writeFile } from "fs"
 import { print } from "./print"
-import { SiteBuild } from "./model"
+import { Article, SiteBuild, Template } from "./model"
 
 const doctype = "<!DOCTYPE html>"
 
@@ -13,25 +13,23 @@ process.on("message", (site: SiteBuild) => compose(site))
 /** Receives build configuration from `build.ts` and runs the templates, producing markup. */
 function compose(site: SiteBuild) {
   defineGlobals()
-  for (const path of site.templates) {
+  const articles = compileAll(site)
+  for (const article of articles) {
     try {
-      const template = Markup.template(path, site)
-      const result = template()
-      const isHtml = path.endsWith(".html.ls")
-      const markup = print(isHtml ? result.page : result, !isHtml)
-      const output = isHtml ? `${doctype}\n${markup}` : markup
-      const target = path.substring(0, path.length - 3)
+      const target = article.path.substring(0, article.path.length - 3)
+      if (article.type === "document") {
+        writeFile(target, print(article.content, true), "utf8")
+        continue
+      }
+      const page = typeof article.page === "function"
+        ? article.page({ ...article, site, articles }) 
+        : article.page
+      const markup = print(page)
+      const output = `${doctype}\n${markup}`
       writeFile(target, output, "utf8")
     }
     catch (e) {
-      if (!(e instanceof Error)) {
-        console.error(`Error in ${path.substring(site.root.length)}:`, e)
-        continue
-      }
-      console.error(`Error in "${path.substring(site.root.length)}":`, e.message)
-      if (!site.watch) {
-        process.exit(1)
-      }
+      report("Runtime", site, article.path, e)
     }
   }
 
@@ -40,6 +38,39 @@ function compose(site: SiteBuild) {
   }
   else {
     process.exit(0)
+  }
+}
+
+function compileAll(site: SiteBuild) {
+  const articles: Article[] = []
+  for (const path of site.templates) {
+    try {
+      const url = path.substring(site.root.length, path.length - 3)
+      const template = Markup.template(path, site)
+      const result = template()
+      if (path.endsWith(".html.ls")) {
+        articles.push({ type: "template", path, url, ...result })
+      }
+      else {
+        articles.push({ type: "document", path, url, content: result })
+      }
+    }
+    catch (e) {
+      report("Compile", site, path, e)
+    }
+  }
+  return articles
+}
+
+/** Print error. */
+function report(context: string, site: SiteBuild, path: string, e: any) {
+  if (!(e instanceof Error)) {
+    console.error(`${context} error in ${path.substring(site.root.length)}:`, e)
+    return
+  }
+  console.error(`${context} error in "${path.substring(site.root.length)}":`, e.message)
+  if (!site.watch) {
+    process.exit(1)
   }
 }
 

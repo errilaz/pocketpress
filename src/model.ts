@@ -5,6 +5,27 @@ export interface SiteBuild {
   templates: string[]
 }
 
+export type Article =
+  | Document
+  | Template
+
+export interface Document {
+  type: "document"
+  path: string
+  url: string
+  content: any
+}
+
+export interface Template {
+  type: "template"
+  path: string
+  url: string
+  page?: any
+  date?: string
+  author?: string
+  tags?: string[]
+}
+
 /** Representation of an HTML element. */
 export class Element {
   tag: string
