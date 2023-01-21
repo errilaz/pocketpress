@@ -4,42 +4,130 @@ import { all as knownProperties } from "known-css-properties"
 import { Markup } from "./markup"
 import { writeFileSync as writeFile } from "fs"
 import { print } from "./print"
-import { SiteBuild } from "./model"
+import { Article, Document, SiteBuild, SiteDetails, Template } from "./model"
 
 const doctype = "<!DOCTYPE html>"
 
 process.on("message", (site: SiteBuild) => compose(site))
 
 /** Receives build configuration from `build.ts` and runs the templates, producing markup. */
-function compose(site: SiteBuild) {
+function compose(build: SiteBuild) {
   defineGlobals()
-  for (const path of site.templates) {
+  const [articles, tagTemplate] = compileArticles(build)
+  const site: SiteDetails = {
+    templates: articles.filter(a => a.type === "template") as Template[],
+    documents: articles.filter(a => a.type === "document") as Document[],
+    ...buildDetails(articles)
+  }
+  if (tagTemplate) {
+    articles.push(...compileTagArticles(tagTemplate, build, site))
+  }
+  for (const article of articles) {
     try {
-      const template = Markup.template(path, site)
-      const result = template()
-      const isHtml = path.endsWith(".html.ls")
-      const markup = print(isHtml ? result.page : result, !isHtml)
-      const output = isHtml ? `${doctype}\n${markup}` : markup
-      const target = path.substring(0, path.length - 3)
+      const target = article.path.substring(0, article.path.length - 3)
+      if (article.type === "document") {
+        writeFile(target, print(article.content, true), "utf8")
+        continue
+      }
+      const page = typeof article.page === "function"
+        ? article.page({ ...article, site }) 
+        : article.page
+      const markup = print(page)
+      const output = `${doctype}\n${markup}`
       writeFile(target, output, "utf8")
     }
     catch (e) {
-      if (!(e instanceof Error)) {
-        console.error(`Error in ${path}:`, e)
-        continue
-      }
-      console.error(`Error in "${path}":`, e.message)
-      if (!site.watch) {
-        process.exit(1)
-      }
+      report("Runtime", build, article.path, e)
     }
   }
 
-  if (site.watch) {
+  if (build.watch) {
     process.send!("done")
   }
   else {
     process.exit(0)
+  }
+}
+
+function compileArticles(build: SiteBuild): [Article[], string | null] {
+  const articles: Article[] = []
+  let tagTemplate = null
+  for (const path of build.templates) {
+    try {
+      if (path.endsWith("[tag].html.ls")) {
+        tagTemplate = path
+        continue
+      }
+      const url = path.substring(build.root.length, path.length - 3)
+      const template = Markup.template(path, build)
+      const result = template()
+      if (path.endsWith(".html.ls")) {
+        if (result.date) {
+          result.date = new Date(result.date)
+        }
+        articles.push({ type: "template", path, url, ...result })
+      }
+      else {
+        articles.push({ type: "document", path, url, content: result })
+      }
+    }
+    catch (e) {
+      report("Compile", build, path, e)
+    }
+  }
+  return [articles, tagTemplate]
+}
+
+function compileTagArticles(tagTemplate: string, build: SiteBuild, site: SiteDetails) {
+  const template = Markup.template(tagTemplate, build)
+  return site.tags.map(tag => {
+    try {
+      const path = tagTemplate.replace("[tag]", tag.name)
+      const url = path.substring(build.root.length, path.length - 3)
+      const result = template()
+      return { type: "template", path, url, tag, ...result }
+    }
+    catch (e) {
+      report("Compile", build, tagTemplate, e)
+    }
+  })
+}
+
+function buildDetails(articles: Article[]): Pick<SiteDetails, "tags" | "authors"> {
+  const tags: { [name: string]: Article[] } = {}
+  const authors: { [name: string]: Article[] } = {}
+  for (const article of articles) {
+    if (article.type === "document") continue
+    if (article.tags) {
+      for (const tag of article.tags) {
+        if (!tags[tag]) tags[tag] = []
+        tags[tag].push(article)
+      }
+    }
+    if (article.author) {
+      if (!authors[article.author]) authors[article.author] = []
+      authors[article.author].push(article)
+    }
+  }
+  return {
+    tags: Object.keys(tags)
+      .map(name => ({ name, templates: tags[name] }))
+      .sort((a, b) => b.templates.length - a.templates.length),
+    authors: Object.keys(authors)
+      .map(name => ({ name, templates: authors[name] }))
+      .sort((a, b) => b.templates.length - a.templates.length),
+  }
+}
+
+/** Print error. */
+function report(context: string, build: SiteBuild, path: string, e: any) {
+  if (!(e instanceof Error)) {
+    console.error(`${context} error in ${path.substring(build.root.length)}:`, e)
+    return
+  }
+  console.error(`${context} error in "${path.substring(build.root.length)}":`, e.message)
+  if (!build.watch) {
+    process.exit(1)
   }
 }
 
