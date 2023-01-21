@@ -10,7 +10,8 @@ import { run } from "./run"
 export module Markup {
   /** Compile a template and return a function which runs it. */
   export function template(path: string, site: SiteBuild) {
-    const contents = readFile(path, "utf8")
+    let contents = readFile(path, "utf8")
+    if (/^\s*$/.test(contents)) contents = `""`
     const ls = `return (${contents})`
     const js = compile(ls, { header: false, filename: path })
     return () => run(js, path, site)
