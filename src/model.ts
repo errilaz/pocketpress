@@ -20,10 +20,23 @@ export interface Template {
   type: "template"
   path: string
   url: string
+  title?: string
   page?: any
-  date?: string
+  date?: Date
   author?: string
   tags?: string[]
+}
+
+export interface SiteDetails {
+  templates: Template[]
+  documents: Document[]
+  authors: Catalog[]
+  tags: Catalog[]
+}
+
+export interface Catalog {
+  name: string
+  articles: Article[]
 }
 
 /** Representation of an HTML element. */
