@@ -13,11 +13,14 @@ process.on("message", (site: SiteBuild) => compose(site))
 /** Receives build configuration from `build.ts` and runs the templates, producing markup. */
 function compose(build: SiteBuild) {
   defineGlobals()
-  const articles = compileAll(build)
+  const [articles, tagTemplate] = compileArticles(build)
   const site: SiteDetails = {
     templates: articles.filter(a => a.type === "template") as Template[],
     documents: articles.filter(a => a.type === "document") as Document[],
     ...buildDetails(articles)
+  }
+  if (tagTemplate) {
+    articles.push(...compileTagArticles(tagTemplate, build, site))
   }
   for (const article of articles) {
     try {
@@ -46,10 +49,15 @@ function compose(build: SiteBuild) {
   }
 }
 
-function compileAll(build: SiteBuild) {
+function compileArticles(build: SiteBuild): [Article[], string | null] {
   const articles: Article[] = []
+  let tagTemplate = null
   for (const path of build.templates) {
     try {
+      if (path.endsWith("[tag].html.ls")) {
+        tagTemplate = path
+        continue
+      }
       const url = path.substring(build.root.length, path.length - 3)
       const template = Markup.template(path, build)
       const result = template()
@@ -67,7 +75,22 @@ function compileAll(build: SiteBuild) {
       report("Compile", build, path, e)
     }
   }
-  return articles
+  return [articles, tagTemplate]
+}
+
+function compileTagArticles(tagTemplate: string, build: SiteBuild, site: SiteDetails) {
+  const template = Markup.template(tagTemplate, build)
+  return site.tags.map(tag => {
+    try {
+      const path = tagTemplate.replace("[tag]", tag.name)
+      const url = path.substring(build.root.length, path.length - 3)
+      const result = template()
+      return { type: "template", path, url, tag, ...result }
+    }
+    catch (e) {
+      report("Compile", build, tagTemplate, e)
+    }
+  })
 }
 
 function buildDetails(articles: Article[]): Pick<SiteDetails, "tags" | "authors"> {
