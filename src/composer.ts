@@ -25,10 +25,10 @@ function compose(site: SiteBuild) {
     }
     catch (e) {
       if (!(e instanceof Error)) {
-        console.error(`Error in ${path}:`, e)
+        console.error(`Error in ${path.substring(site.root.length)}:`, e)
         continue
       }
-      console.error(`Error in "${path}":`, e.message)
+      console.error(`Error in "${path.substring(site.root.length)}":`, e.message)
       if (!site.watch) {
         process.exit(1)
       }
