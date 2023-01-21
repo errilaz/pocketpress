@@ -36,7 +36,7 @@ export interface SiteDetails {
 
 export interface Catalog {
   name: string
-  articles: Article[]
+  templates: Article[]
 }
 
 /** Representation of an HTML element. */

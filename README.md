@@ -2,7 +2,7 @@
 
 > An extremely static site generator
 
-PocketPress is a little zero-config SSG that produces HTML/CSS from a [LiveScript](https://livescript.net)-based DSL. It is meant to create simple sites quickly, typically hosted on GitHub pages.
+PocketPress is a little zero-config SSG that produces HTML/CSS from a [LiveScript](https://livescript.net)-based DSL. It is meant to create simple sites quickly.
 
 ## Install
 
@@ -114,6 +114,38 @@ page: layout "My Page",
 
 `include` understands `~/` at the beginning of the path as relative to the site root.
 
+## Page Metadata
+
+More properties can be specified beside the `page` result. If the `page` is a function,
+these and other useful properties will be passed to it:
+
+```ls
+date: "2023-01-21"
+title: "This is a blog entry!"
+author: "errilaz"
+tags: <[ birthday ]>
+page: ({ date, title, author, tags, url, site }) -> div do
+  h1 "#title by #author"
+```
+
+- `date` will be transformed into an instance of `Date`.
+- `url` contains the path to the resulting html file.
+- `site.templates` contains the metadata for all `.html.ls` templates.
+- `site.authors` contains a list of `{ name, templates }` organized by author.
+- `site.tags` contains a list of `{ name, templates }` organized by tag.
+
+## Tag Pages
+
+A file named `[tag].html.ls` will generate a page per tag, passing a `tag` property to
+the page function. You can use `tag.name` and `tag.templates` to generate a tag index.
+
+```ls
+page: ({ tag }) -> div do
+  h1 "Articles tagged \"#{tag.name}\""
+  ul tag.templates.map ->
+    li a href: "#{it.url}", it.title
+```
+
 ## Live Reload
 
 `live-reload!` embeds a script tag in watch mode which will check and reload pages. This is meant to be used with local `file:///` URLs as embedding a web server for this feature seemed excessive. If this is used, please add `.live-reload.js` to your source control ignore file.
@@ -152,7 +184,7 @@ livescript """
 
 Standalone `.md` documents can also be generated with `.md.ls` files. This is useful for READMEs containing repeated content or complex tables.
 
-The `page:` property is not used, instead use the `document` function:
+The `page` property is not used, instead use the `document` function:
 
 ```ls
 dont-repeat-yourself = "something you want to embed over and over"

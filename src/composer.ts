@@ -111,11 +111,11 @@ function buildDetails(articles: Article[]): Pick<SiteDetails, "tags" | "authors"
   }
   return {
     tags: Object.keys(tags)
-      .map(name => ({ name, articles: tags[name] }))
-      .sort((a, b) => b.articles.length - a.articles.length),
+      .map(name => ({ name, templates: tags[name] }))
+      .sort((a, b) => b.templates.length - a.templates.length),
     authors: Object.keys(authors)
-      .map(name => ({ name, articles: authors[name] }))
-      .sort((a, b) => b.articles.length - a.articles.length),
+      .map(name => ({ name, templates: authors[name] }))
+      .sort((a, b) => b.templates.length - a.templates.length),
   }
 }
 
