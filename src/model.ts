@@ -1,3 +1,9 @@
+export interface SiteConfig {
+  baseUrl: string
+  title?: string
+  language?: string
+}
+
 /** Site build configuration. */
 export interface SiteBuild {
   root: string
@@ -25,6 +31,9 @@ export interface Template {
   date?: Date
   author?: string
   tags?: string[]
+  feed?: boolean
+  map?: boolean
+  summary?: string
 }
 
 export interface SiteDetails {
