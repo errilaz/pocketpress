@@ -122,8 +122,11 @@ these and other useful properties will be passed to it:
 ```ls
 date: "2023-01-21"
 title: "This is a blog entry!"
+summary: "This is a summary used in feeds!"
 author: "errilaz"
 tags: <[ birthday ]>
+map: true
+feed: true
 page: ({ date, title, author, tags, url, site }) -> div do
   h1 "#title by #author"
 ```
@@ -149,6 +152,8 @@ page: ({ tag }) -> div do
 ## Live Reload
 
 `live-reload!` embeds a script tag in watch mode which will check and reload pages. This is meant to be used with local `file:///` URLs as embedding a web server for this feature seemed excessive. If this is used, please add `.live-reload.js` to your source control ignore file.
+
+`link-to` is a helper function which will, in watch mode, produce `file:` URLs based on root-relative paths. It will append `index.html` to paths ending in `/` (apart from the root `/`). This way links can be followed in watch mode. Outside of watch mode, the trailing slash will simply be dropped. 
 
 ## Embedded Markdown
 
@@ -179,6 +184,19 @@ livescript """
 `elem` creates a custom element with the given tag and contents.
 
 `load-file` synchronously reads a file relative to the current file. You can use `~/` at the start of the path to refer to the site root.
+
+## Site Metadata
+
+PocketPress will look for a `package.json` at the root, and if `pocket.baseUrl` field is populated, will use it to produce `/robots.txt`, `/sitemap.xml`, `/feed.xml` (Atom), and `/feed.json`:
+
+```json
+  "pocket": {
+    "baseUrl": "https://example.com",
+    "title": "Appears as title in feeds"
+  }
+```
+
+Any page containing the `date` metadata will be included in the feed, unless `feed: false` is also specified. Pages can be opted-in to the sitemap with `map: true`.
 
 ## Markdown Document Generator
 

@@ -2,9 +2,11 @@ import tags from "html-tags"
 import voids from "html-tags/void"
 import { all as knownProperties } from "known-css-properties"
 import { Markup } from "./markup"
-import { writeFileSync as writeFile } from "fs"
+import { writeFileSync as writeFile, accessSync as access, constants, readFileSync as readFile } from "fs"
 import { print } from "./print"
-import { Article, Document, SiteBuild, SiteDetails, Template } from "./model"
+import { Article, Document, SiteBuild, SiteConfig, SiteDetails, Template } from "./model"
+import { join } from "path"
+import { buildFeedJson, buildFeedXml, buildRobotsTxt, buildSitemapXml } from "./metadata"
 
 const doctype = "<!DOCTYPE html>"
 
@@ -41,11 +43,31 @@ function compose(build: SiteBuild) {
     }
   }
 
+  writeSiteMetadata(build, site)
+
   if (build.watch) {
     process.send!("done")
   }
   else {
     process.exit(0)
+  }
+}
+
+function writeSiteMetadata(build: SiteBuild, site: SiteDetails) {
+  const packageJson = join(build.root, "package.json")
+  if (!exists(packageJson)) return
+  const config = JSON.parse(readFile(packageJson, "utf8"))?.pocket as SiteConfig
+  if (!config || !config.baseUrl) return
+
+  writeFile(join(build.root, "sitemap.xml"), buildSitemapXml(build, site, config), "utf8")
+  writeFile(join(build.root, "robots.txt"), buildRobotsTxt(build, site, config), "utf8")
+
+  const entries = site.templates
+    .filter(t => !!t.date && t.feed !== false)
+    .sort((a, b) => b.date!.getDate()! - a.date!.getDate())
+  if (entries.length > 0) {
+    writeFile(join(build.root, "feed.xml"), buildFeedXml(build, entries, config), "utf8")
+    writeFile(join(build.root, "feed.json"), buildFeedJson(build, entries, config), "utf8")
   }
 }
 
@@ -175,4 +197,12 @@ function propertyName(property: string) {
 /** Turn a kebab-case name into camelCase. */
 function camelize(kebab: string) {
   return kebab.replace(/-[a-z]/g, ([, c]) => c.toUpperCase());
+}
+
+function exists(file: string) {
+  try {
+    access(file, constants.F_OK)
+    return true
+  }
+  catch { return false }
 }
