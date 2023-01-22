@@ -1,7 +1,11 @@
 #!/bin/bash
 POCKET=$(realpath "$(dirname $(readlink -f $BASH_SOURCE))/..")
 if [[ $POCKET_DEV = "true" ]]; then
+  echo "Running pocket in ts-node..."
   "$POCKET/node_modules/.bin/ts-node" -P "$POCKET/tsconfig.json" "$POCKET/src/pocket.ts" "$@"
+elif [[ $POCKET_DEV = "bun" ]]; then
+  echo "Running pocket in bun..."
+  bun --tsconfig-override "$POCKET/tsconfig.json" "$POCKET/src/pocket.ts" "$@"
 else
   node "$POCKET/lib/pocket.js" "$@"
 fi
