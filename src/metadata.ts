@@ -21,7 +21,7 @@ export function buildFeedXml(build: SiteBuild, entries: Template[], config: Site
 	<title>${escapeHtml(config.title || config.baseUrl)}</title>
 	<link href="${config.baseUrl}/feed.xml" rel="self" />
 	<link href="${config.baseUrl}/" />
-	<id>${config.baseUrl}</id>
+	<id>${config.baseUrl}/</id>
 	<updated>${updated}</updated>
   <generator uri="https://github.com/errilaz/pocketpress" version="1.0">
     PocketPress
@@ -30,12 +30,13 @@ export function buildFeedXml(build: SiteBuild, entries: Template[], config: Site
   const tail = `
 </feed>
 `
-  return `${head}${entries.map(({ url, title, summary, date }) => `  <entry>
+  return `${head}${entries.map(({ url, title, summary, date, author }) => `  <entry>
     <id>${config.baseUrl}${url}</id>
     <title>${escapeHtml(title)}</title>
     <summary>${escapeHtml(summary)}</summary>
     <updated>${date!.toISOString()}</updated>
     <content>${config.baseUrl}${trimIndex(url)}</content>
+    <author><name>${author || "Unknown"}</name></author>
   </entry>`).join("\n")}${tail}` 
 }
 
