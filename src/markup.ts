@@ -129,6 +129,19 @@ export module Markup {
     return contents.reduce((contents, content) =>
       [...contents, raw("\n\n"), content], [])
   }
+
+  /** Returns `link-to` function with provided `root`. */
+  export function linkToFrom(root: string, watch: boolean) {
+    /** Given root-relative url, creates a URL that will work in local watch mode, where a trailing `/` will append `index.html`. */
+    return function linkTo(url: string) {
+      if (!watch) {
+        if (url.length > 1 && url.endsWith("/")) return url.substring(0, url.length - 1)
+        return url
+      }
+      if (url.endsWith("/")) return root + url + "index.html"
+      return root + url
+    }
+  }
 }
 
 /** Transform camelCase name into kebab-case. */
