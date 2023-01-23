@@ -31,10 +31,7 @@ function printNode(x: any, p: Printer) {
         p.text += escape(x).replace(/\n/g, `${end(p)}${indent(p)}`)
       break
     case x instanceof Raw:
-      if (p.compact)
-        p.text += x.text
-      else
-        p.text += x.text.replace(/\n/g, `${end(p)}${indent(p)}`)
+      p.text += x.text
       break
     case Array.isArray(x):
       for (const e of x)
