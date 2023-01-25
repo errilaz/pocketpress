@@ -18,8 +18,8 @@ export module Markup {
   }
 
   /** Constructs a CSS rule. */
-  export function rule(selector: string, ...properties: Property[]) {
-    return new Rule(selector, properties)
+  export function rule(selector: string, ...contents: (Property | Rule)[]) {
+    return new Rule(selector, contents)
   }
 
   /** Factory for Element instances with CSS class name proxies wrapping them. */

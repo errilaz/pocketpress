@@ -28,7 +28,7 @@ function compose(build: SiteBuild) {
     try {
       const target = article.path.substring(0, article.path.length - 3)
       if (article.type === "document") {
-        writeFile(target, print(article.content, true), "utf8")
+        writeFile(target, print(article.content), "utf8")
         continue
       }
       const page = typeof article.page === "function"
