@@ -2,18 +2,16 @@ import escape from "escape-html"
 import { Element, MediaQuery, Raw, Rule } from "./model"
 
 /** State for `print`. */
-interface Printer {
-  text: string
-}
+interface Printer { text: string }
 
-/** Pretty print HTML content. */
+/** Render HTML content. */
 export function print(x: any) {
   const printer = { text: "" }
   printNode(x, printer)
   return printer.text
 }
 
-/** Add an artifact to the `Printer`. */
+/** Render an object */
 function printNode(x: any, p: Printer) {
   const type = typeof x
   switch (true) {
@@ -69,6 +67,7 @@ function printNode(x: any, p: Printer) {
   }
 }
 
+/** Render a CSS rule (and any nested rules). */
 function printRule(rule: Rule, p: Printer, prefix?: string) {
   let selectors = rule.selector.split(",").map(s => s.trim())
   if (prefix) {

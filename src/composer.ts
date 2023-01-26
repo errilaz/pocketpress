@@ -115,6 +115,7 @@ function compileTagArticles(tagTemplate: string, build: SiteBuild, site: SiteDet
   })
 }
 
+/** Builds `tags` and `authors`. */
 function buildDetails(articles: Article[]): Pick<SiteDetails, "tags" | "authors"> {
   const tags: { [name: string]: Article[] } = {}
   const authors: { [name: string]: Article[] } = {}

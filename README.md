@@ -45,6 +45,15 @@ page:
 
 All HTML elements are pre-defined functions. The `var` element is called `_var` to work with JS syntax.
 
+## Class Syntax Sugar
+
+You can apply classes directly to the element functions:
+
+```ls
+div.red-bold "this is bold and red!"
+div.red-bold.also-italic "this has two classes!"
+```
+
 ## Styles
 
 Style tags can use the `rule` and `media` block functions, and custom properties with `prop`:
@@ -62,15 +71,6 @@ style do
 
 All CSS properties are pre-defined functions. The `continue` property is called `_continue` to work with JS syntax.
 
-## Class Sugar
-
-You can apply classes directly to the element functions:
-
-```ls
-div.red-bold "this is bold and red!"
-div.red-bold.also-italic "this has two classes!"
-```
-
 ## Inline Styles
 
 You can also use CSS properties directly on elements:
@@ -80,6 +80,44 @@ div do
   color "red"
   font-weight "bold"
   "this is bold and red!"
+```
+
+## Nested Rules
+
+Rules may be nested:
+
+```ls
+rule ".danger",
+  color "red"
+  rule ".icon",
+    float "right"
+```
+
+Child selectors can be combined with the parent selector, similar to Sass and Less.js. This results in a second rule with the selector `.danger.large`:
+
+```ls
+rule ".danger",
+  color "red"
+  rule "&.large",
+    font-size "30px"
+```
+
+Nested selectors with pseudo-classes do the same:
+
+```ls
+rule "a",
+  color "red"
+  rule ":hover",
+    text-decoration "underline"
+```
+
+PocketPress detects multiple selectors in a rule and will generate the necessary CSS:
+
+```ls
+rule "input, textarea",
+  border "solid 1px gray"
+  rule ":hover, :focus",
+    border-color "black"
 ```
 
 ## Layouts & Partials
