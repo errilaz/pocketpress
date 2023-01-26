@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "chokidar": "^3.5.3",
+    "cssesc": "^3.0.0",
     "escape-html": "^1.0.3",
     "html-tags": "^3.2.0",
     "known-css-properties": "^0.26.0",
@@ -41,6 +42,7 @@
     "toptions": "^1.0.2"
   },
   "devDependencies": {
+    "@types/cssesc": "^3.0.0",
     "@types/escape-html": "^1.0.2",
     "@types/marked": "^4.0.8",
     "@types/node": "^18.11.18",

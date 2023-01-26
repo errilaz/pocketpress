@@ -1,5 +1,5 @@
 import escape from "escape-html"
-import { Element, MediaQuery, Raw, Rule } from "./model"
+import { BlockAtRule, Element, NestedAtRule, Property, Raw, RegularAtRule, Rule } from "./model"
 
 /** State for `print`. */
 interface Printer { text: string }
@@ -56,12 +56,32 @@ function printNode(x: any, p: Printer) {
       printRule(x, p)
       break
     }
-    case x instanceof MediaQuery: {
-      p.text += `@media ${x.query}{`
-      for (const rule of x.rules) {
-        printRule(rule, p)
+    case x instanceof RegularAtRule: {
+      p.text += `@${x.keyword} ${x.rule};`
+      break
+    }
+    case x instanceof NestedAtRule: {
+      p.text += `@${x.keyword} ${x.rule}`
+      if (x.contents.length === 0 && Object.keys(x.properties).length === 0) {
+        p.text += ";"
+        break
       }
-      p.text += `}`
+      p.text += "{"
+      p.text += Object.keys(x.properties)
+        .map(key => `${key}:${x.properties[key]}`)
+        .join(`;`)
+      for (const content of x.contents) {
+        printNode(content, p)
+      }
+      p.text += "}"
+      break
+    }
+    case x instanceof BlockAtRule: {
+      p.text += `@${x.keyword}{`
+      p.text += Object.keys(x.properties)
+        .map(key => `${key}:${x.properties[key]}`)
+        .join(`;`)
+      p.text += "}"
       break
     }
   }

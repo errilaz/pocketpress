@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { Element, MediaQuery, Property, Raw, Rule } from "../src/model"
+import { BlockAtRule, Element, NestedAtRule, Property, Raw, RegularAtRule, Rule } from "../src/model"
 import { print } from "../src/print"
 
 describe("print", () => {
@@ -125,8 +125,22 @@ describe("print", () => {
     expect(output).toBe(".foo .baz,.foo .buz{color:green}.bar .baz,.bar .buz{color:green}")
   })
 
-  it("renders media queries", () => {
-    const output = print(new MediaQuery("(min-width: 600px)", [
+  it("renders regular at-rules", () => {
+    const output = print(new RegularAtRule("import", "url(foo.css)"))
+
+    expect(output).toBe("@import url(foo.css);")
+  })
+
+  it("renders block at-rules", () => {
+    const output = print(new BlockAtRule("font-face", [
+      new Property("font-family", `"Consolas"`)
+    ]))
+
+    expect(output).toBe(`@font-face{font-family:"Consolas"}`)
+  })
+
+  it("renders nested at-rules containing rules", () => {
+    const output = print(new NestedAtRule("media", "(min-width: 600px)", [
       new Rule(".foo", [
         new Property("color", "red")
       ])
@@ -135,8 +149,8 @@ describe("print", () => {
     expect(output).toBe("@media (min-width: 600px){.foo{color:red}}")
   })
 
-  it("renders media queries with nested rules", () => {
-    const output = print(new MediaQuery("(min-width: 600px)", [
+  it("renders nested at-rules containing nested rules", () => {
+    const output = print(new NestedAtRule("media", "(min-width: 600px)", [
       new Rule(".foo", [
         new Property("color", "red"),
         new Rule(".bar", [
@@ -147,4 +161,31 @@ describe("print", () => {
 
     expect(output).toBe("@media (min-width: 600px){.foo{color:red}.foo .bar{color:blue}}")
   })
+
+  it("renders nested at-rules nested inside other nested at-rule", () => {
+    const output = print(new NestedAtRule("supports", "(display: flex)", [
+      new NestedAtRule("media", "(min-width: 900px)", [
+        new Rule(".foo", [
+          new Property("display", "flex")
+        ])
+      ])
+    ]))
+
+    expect(output).toBe("@supports (display: flex){@media (min-width: 900px){.foo{display:flex}}}")
+  })
+
+  it("renders nested at-rules without contents", () => {
+    const output = print(new NestedAtRule("layer", "utilities", []))
+
+    expect(output).toBe("@layer utilities;")
+  })
+
+  it("renders nested at-rules with properties", () => {
+    const output = print(new NestedAtRule("counter-style", "thumbs", [
+      new Property("system", "cyclic")
+    ]))
+
+    expect(output).toBe("@counter-style thumbs{system:cyclic}")
+  })
+
 })

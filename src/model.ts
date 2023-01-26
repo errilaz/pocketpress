@@ -66,7 +66,7 @@ export class Element {
 
   add(content: any) {
     if (isEmpty(content)) return
-    else if (isChild(content)) {
+    else if (isChildObject(content)) {
       this.children.push(content)
     }
     else if (content instanceof Property) {
@@ -127,19 +127,62 @@ export class Rule {
   }
 }
 
-export class MediaQuery {
-  query: string
-  rules: Rule[] = []
+/** Base class (for `instanceof` purposes). */
+export class AtRule {}
 
-  constructor(query: string, rules: Rule[]) {
-    this.query = query
-    for (const rule of rules) {
-      this.add(rule)
+/** Represents at-rules with a property-like syntax (such as `@charset`). */
+export class RegularAtRule extends AtRule {
+  keyword: string
+  rule: string
+
+  constructor(keyword: string, rule: string) {
+    super()
+    this.keyword = keyword
+    this.rule = rule
+  }
+}
+
+/** Represents at-rules which may have both a rule and a block syntax (such as `@media`). */
+export class NestedAtRule extends AtRule {
+  keyword: string
+  rule: string
+  properties: { [name: string]: string } = {}
+  contents: any[] = []
+
+  constructor(keyword: string, rule: string, contents: any[]) {
+    super()
+    this.keyword = keyword
+    this.rule = rule
+    for (const content of contents) {
+      this.add(content)
     }
   }
 
-  add(rule: Rule) {
-    this.rules.push(rule)
+  add(content: Property | Rule) {
+    if (content instanceof Property) {
+      this.properties[content.name] = content.value
+    }
+    else {
+      this.contents.push(content)
+    }
+  }
+}
+
+/** Represets at-rules which have a block but no rule syntax (such as `@font-face`). */
+export class BlockAtRule extends AtRule {
+  keyword: string
+  properties: { [name: string]: string } = {}
+
+  constructor(keyword: string, properties: Property[]) {
+    super()
+    this.keyword = keyword
+    for (const property of properties) {
+      this.add(property)
+    }
+  }
+
+  add(content: Property) {
+    this.properties[content.name] = content.value
   }
 }
 
@@ -159,10 +202,10 @@ function isEmpty(x: any) {
     || x === false
 }
 
-function isChild(x: any) {
+function isChildObject(x: any) {
   return x === true
     || x instanceof Element
     || x instanceof Rule
     || x instanceof Raw
-    || x instanceof MediaQuery
+    || x instanceof AtRule
 }
