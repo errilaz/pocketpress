@@ -2,10 +2,10 @@ import tags from "html-tags"
 import voids from "html-tags/void"
 import { all as knownProperties } from "known-css-properties"
 import { Markup } from "./markup"
-import { writeFileSync as writeFile, accessSync as access, constants, readFileSync as readFile } from "fs"
+import { writeFileSync, mkdirSync, accessSync, constants, readFileSync } from "fs"
 import { print } from "./print"
 import { Article, Document, SiteBuild, SiteConfig, SiteDetails, Stylesheet, Template } from "./model"
-import { join } from "path"
+import { dirname, join } from "path"
 import { buildFeedJson, buildFeedXml, buildRobotsTxt, buildSitemapXml } from "./metadata"
 import { atRules } from "./atRules"
 
@@ -31,9 +31,9 @@ function compose(build: SiteBuild) {
   }
   for (const article of articles) {
     try {
-      const target = article.path.substring(0, article.path.length - 3)
+      const target = join(build.output, article.path.substring(build.root.length, article.path.length - 3))
       if (article.type !== "template") {
-        writeFile(target, print(article.content), "utf8")
+        writeFile(target, print(article.content))
         continue
       }
       const meta: any = { ...article, site }
@@ -47,7 +47,7 @@ function compose(build: SiteBuild) {
         : article.page
       const markup = print(page)
       const output = `${doctype}\n${markup}`
-      writeFile(target, output, "utf8")
+      writeFile(target, output)
     }
     catch (e) {
       report("Runtime", build, article.path, e)
@@ -67,15 +67,15 @@ function compose(build: SiteBuild) {
 function writeSiteMetadata(build: SiteBuild, site: SiteDetails, entries: Template[]) {
   const packageJson = join(build.root, "package.json")
   if (!exists(packageJson)) return
-  const config = JSON.parse(readFile(packageJson, "utf8"))?.pocket as SiteConfig
+  const config = JSON.parse(readFile(packageJson))?.pocket as SiteConfig
   if (!config || !config.baseUrl) return
 
-  writeFile(join(build.root, "sitemap.xml"), buildSitemapXml(build, site, config), "utf8")
-  writeFile(join(build.root, "robots.txt"), buildRobotsTxt(build, site, config), "utf8")
+  writeFile(join(build.output, "sitemap.xml"), buildSitemapXml(build, site, config))
+  writeFile(join(build.output, "robots.txt"), buildRobotsTxt(build, site, config))
 
   if (entries.length > 0) {
-    writeFile(join(build.root, "feed.xml"), buildFeedXml(build, entries, config), "utf8")
-    writeFile(join(build.root, "feed.json"), buildFeedJson(build, entries, config), "utf8")
+    writeFile(join(build.output, "feed.xml"), buildFeedXml(build, entries, config))
+    writeFile(join(build.output, "feed.json"), buildFeedJson(build, entries, config))
   }
 }
 
@@ -216,10 +216,22 @@ function camelize(kebab: string) {
   return kebab.replace(/-[a-z]/g, ([, c]) => c.toUpperCase());
 }
 
-function exists(file: string) {
+function exists(path: string) {
   try {
-    access(file, constants.F_OK)
+    accessSync(path, constants.F_OK)
     return true
   }
   catch { return false }
+}
+
+function writeFile(path: string, data: string) {
+  const dir = dirname(path)
+  if (!exists(dir)) {
+    mkdirSync(dir, { recursive: true })
+  }
+  writeFileSync(path, data, "utf8")
+}
+
+function readFile(path: string) {
+  return readFileSync(path, "utf8")
 }

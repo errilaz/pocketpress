@@ -3,7 +3,7 @@ import { join } from "path"
 import { ChildProcess, fork } from "child_process"
 
 /** Scans the site directory, collecting template paths and sending them to spawned composer process. */
-export async function build(root: string, watch: boolean, excludes: string[], composer?: ChildProcess) {
+export async function build(root: string, output: string, watch: boolean, excludes: string[], composer?: ChildProcess) {
   const templates: string[] = []
   await scanDir(root)
 
@@ -13,7 +13,7 @@ export async function build(root: string, watch: boolean, excludes: string[], co
     })
   }
 
-  composer.send({ root, watch, templates })
+  composer.send({ root, output, watch, templates })
 
   await new Promise<void>(resolve => {
     composer!.once(watch ? "message" : "close", () => resolve())

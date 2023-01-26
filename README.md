@@ -17,10 +17,10 @@ yarn add pocketpress
 ## Usage
 
 ```
-pocket [options]
+pocket [options] [path]
   
   Options:
-    -p, --path <dir>      Path to site directory
+    -o, --output <dir>    Output directory
     -e, --exclude <dir>   Ignore directory
     -w, --watch           Enter watch mode
     -h, --help            Display this message

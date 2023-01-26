@@ -7,6 +7,7 @@ export interface SiteConfig {
 /** Site build configuration. */
 export interface SiteBuild {
   root: string
+  output: string
   watch: boolean
   templates: string[]
 }

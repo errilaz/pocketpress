@@ -3,18 +3,18 @@ import { resolve } from "path"
 import { build } from "./build"
 import { watcher } from "./watcher"
 
-const cwd = process.cwd()
-
 const parse = options({
-  path: options.flag("p", "", cwd),
+  path: options.arg(0),
+  output: options.flag("o"),
   exclude: options.list("e", ""),
   watch: options.bit("w"),
   help: options.bit("h"),
 })
 
-const { path, exclude, watch, help } = parse(process.argv.slice(2))
+const { path, output, exclude, watch, help } = parse(process.argv.slice(2))
 
-const root = resolve(path!)
+const root = resolve(path || "")
+const out = output ? resolve(output) : root
 
 if (help) {
   usage()
@@ -28,19 +28,19 @@ const excludes = [
 ].map(dir => resolve(root, dir))
 
 if (!watch) {
-  build(root!, !!watch, excludes)
+  build(root, out, !!watch, excludes)
     .catch(e => { console.error(e); process.exit(1) })
 }
 else {
   console.log(`watching ${root}`)
-  watcher(root!, excludes)
+  watcher(root, out, excludes)
 }
 
 function usage() {
-  console.log(`Usage: pocket [options]
+  console.log(`Usage: pocket [options] [path]
   
   Options:
-    -p, --path <dir>      Path to site directory
+    -o, --output <dir>    Output directory
     -e, --exclude <dir>   Ignore directory
     -w, --watch           Enter watch mode
     -h, --help            Display this message

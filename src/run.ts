@@ -6,6 +6,6 @@ export function run(__code: string, __path: string, __build: SiteBuild) {
   const include = Markup.includeFrom(__path, __build)
   const loadFile = Markup.loadFileFrom(__path, __build.root)
   const liveReload = Markup.liveReloadFrom(__build.root, __build.watch)
-  const linkTo = Markup.linkToFrom(__build.root, __build.watch)
+  const linkTo = Markup.linkToFrom(__build.output, __build.watch)
   return eval(__code)
 }

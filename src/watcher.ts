@@ -4,9 +4,9 @@ import { join } from "path"
 import { build } from "./build"
 
 /** Starts a chokidar watch to build on changes. */
-export async function watcher(root: string, excludes: string[]) {
+export async function watcher(root: string, output: string, excludes: string[]) {
   const ignored = [...excludes, "**/*.html", "**/*.css", ".live-reload.js"]
-  const composer = await build(root!, !!watch, excludes)
+  const composer = await build(root, output, !!watch, excludes)
   console.log("built site")
   await writeFile(join(root, ".live-reload.js"), liveReload(), "utf8")
   watch(`${root}/**/*.ls`, {
@@ -15,7 +15,7 @@ export async function watcher(root: string, excludes: string[]) {
     cwd: root,
   }).on("all", async (event, path) => {
     console.log(path, `${event}d`)
-    await build(root!, !!watch, excludes, composer)
+    await build(root, output, !!watch, excludes, composer)
     await writeFile(join(root, ".live-reload.js"), liveReload(), "utf8")
     console.log("rebuilt site")
   })
