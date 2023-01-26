@@ -295,6 +295,8 @@ For less clutter, you can collapse generated files in Visual Studio Code with th
   "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {
     "*.html.ls": "$(capture).html",
+    "*.css.ls": "$(capture).html",
+    "*.md.ls": "$(capture).md",
     "[tag].html.ls": "*.html",
     "index.html.ls": "sitemap.xml, robots.txt, feed.json, feed.xml",
   },
