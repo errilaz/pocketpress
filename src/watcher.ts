@@ -3,6 +3,7 @@ import { writeFile } from "fs/promises"
 import { join } from "path"
 import { build } from "./build"
 
+/** Starts a chokidar watch to build on changes. */
 export async function watcher(root: string, excludes: string[]) {
   const ignored = [...excludes, "**/*.html", ".live-reload.js"]
   const composer = await build(root!, !!watch, excludes)
@@ -20,6 +21,7 @@ export async function watcher(root: string, excludes: string[]) {
   })
 }
 
+/** Creates an updated live reload script. */
 function liveReload() {
   const time = Date.now()
   return `(function() {

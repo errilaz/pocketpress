@@ -108,16 +108,22 @@ export class Property {
 export class Rule {
   selector: string
   properties: { [name: string]: string } = {}
+  rules: Rule[] = []
 
-  constructor(selector: string, properties: Property[]) {
+  constructor(selector: string, contents: (Property | Rule)[]) {
     this.selector = selector
-    for (const property of properties) {
-      this.add(property)
+    for (const content of contents) {
+      this.add(content)
     }
   }
 
-  add(property: Property) {
-    this.properties[property.name] = property.value
+  add(content: Property | Rule) {
+    if (content instanceof Property) {
+      this.properties[content.name] = content.value
+    }
+    else if (content instanceof Rule) {
+      this.rules.push(content)
+    }
   }
 }
 

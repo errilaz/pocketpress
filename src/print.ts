@@ -2,20 +2,16 @@ import escape from "escape-html"
 import { Element, MediaQuery, Raw, Rule } from "./model"
 
 /** State for `print`. */
-interface Printer {
-  text: string
-  level: number
-  compact: boolean
-}
+interface Printer { text: string }
 
-/** Pretty print HTML content. */
-export function print(x: any, compact = false) {
-  const printer = { text: "", level: 0, compact }
+/** Render HTML content. */
+export function print(x: any) {
+  const printer = { text: "" }
   printNode(x, printer)
   return printer.text
 }
 
-/** Add an artifact to the `Printer`. */
+/** Render an object */
 function printNode(x: any, p: Printer) {
   const type = typeof x
   switch (true) {
@@ -25,10 +21,7 @@ function printNode(x: any, p: Printer) {
     case type === "number":
     case type === "boolean":
     case type === "bigint":
-      if (p.compact)
-        p.text += escape(x)
-      else 
-        p.text += escape(x).replace(/\n/g, `${end(p)}${indent(p)}`)
+      p.text += escape(x)
       break
     case x instanceof Raw:
       p.text += x.text
@@ -49,56 +42,60 @@ function printNode(x: any, p: Printer) {
       if (properties.length > 0) {
         p.text += ` style="${properties}"`
       }
-      p.text += `>${end(p)}`
+      p.text += `>`
       if (x.isVoid) {
-        p.text += indent(p)
         break
       }
-      p.level++
-      p.text += indent(p)
       for (const child of x.children) {
         printNode(child, p)
       }
-      p.level--
-      p.text += `${end(p)}${indent(p)}`
-      p.text += `</${x.tag}>${end(p)}${indent(p)}`
+      p.text += `</${x.tag}>`
       break
     }
     case x instanceof Rule: {
-      p.text += `${x.selector} {${end(p)}`
-      p.level++
-      p.text += Object.keys(x.properties)
-        .map(key => `${indent(p)}${key}: ${x.properties[key]}`)
-        .join(`;${end(p)}`)
-      p.level--
-      p.text += `${end(p)}${indent(p)}}${end(p)}${indent(p)}`
+      printRule(x, p)
       break
     }
     case x instanceof MediaQuery: {
-      p.text += `@media ${x.query} {${end(p)}`
-      p.level++
-      p.text += indent(p)
+      p.text += `@media ${x.query}{`
       for (const rule of x.rules) {
-        printNode(rule, p)
+        printRule(rule, p)
       }
-      p.level--
-      p.text += `${end(p)}${indent(p)}}${end(p)}${indent(p)}`
+      p.text += `}`
       break
     }
   }
 }
 
-/** Returns necessary indentation spaces based on `Printer` state. */
-function indent(p: Printer) {
-  if (p.compact) return ""
-  let s = ""
-  for (let i = 0; i < p.level; i++) {
-    s += "  "
+/** Render a CSS rule (and any nested rules). */
+function printRule(rule: Rule, p: Printer, prefix?: string) {
+  let selectors = rule.selector.split(",").map(s => s.trim())
+  if (prefix) {
+    selectors = selectors.map(selector => {
+      if (selector.startsWith("&")) {
+        return prefix + selector.substring(1)
+      }
+      else if (selector.startsWith(":")) {
+        return prefix + selector
+      }
+      else {
+        return prefix + " " + selector
+      }
+    })
   }
-  return s
-}
+  const keys = Object.keys(rule.properties)
+  if (keys.length > 0) {
+    p.text += `${selectors.join(",")}{`
+    p.text += Object.keys(rule.properties)
+      .map(key => `${key}:${rule.properties[key]}`)
+      .join(`;`)
+    p.text += `}`
+  }
 
-function end(p: Printer) {
-  if (p.compact) return ""
-  return "\n"
+  if (rule.rules.length === 0) return
+  for (const selector of selectors) {
+    for (const sub of rule.rules) {
+      printRule(sub, p, selector)
+    }
+  }
 }
