@@ -255,3 +255,16 @@ document do
       td dont-repeat-yourself
       td dont-repeat-yourself
 ```
+
+## VSCode Settings
+
+For less clutter, you can collapse generated files in Visual Studio Code with these settings:
+
+```json
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.html.ls": "$(capture).html",
+    "[tag].html.ls": "*.html",
+    "index.html.ls": "sitemap.xml, robots.txt, feed.json, feed.xml",
+  },
+```
