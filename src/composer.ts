@@ -23,6 +23,9 @@ function compose(build: SiteBuild) {
     stylesheets: articles.filter(a => a.type === "stylesheet") as Stylesheet[],
     ...buildDetails(articles)
   }
+  const entries = site.templates
+    .filter(t => !!t.date && t.feed !== false)
+    .sort((a, b) => b.date!.getDate()! - a.date!.getDate())
   if (tagTemplate) {
     articles.push(...compileTagArticles(tagTemplate, build, site))
   }
@@ -33,8 +36,14 @@ function compose(build: SiteBuild) {
         writeFile(target, print(article.content), "utf8")
         continue
       }
+      const meta: any = { ...article, site }
+      const index = entries.findIndex(e => e.path === article.path)
+      if (index !== -1) {
+        meta.next = entries[index - 1]
+        meta.previous = entries[index + 1]
+      }
       const page = typeof article.page === "function"
-        ? article.page({ ...article, site }) 
+        ? article.page(meta) 
         : article.page
       const markup = print(page)
       const output = `${doctype}\n${markup}`
@@ -45,7 +54,7 @@ function compose(build: SiteBuild) {
     }
   }
 
-  writeSiteMetadata(build, site)
+  writeSiteMetadata(build, site, entries)
 
   if (build.watch) {
     process.send!("done")
@@ -55,7 +64,7 @@ function compose(build: SiteBuild) {
   }
 }
 
-function writeSiteMetadata(build: SiteBuild, site: SiteDetails) {
+function writeSiteMetadata(build: SiteBuild, site: SiteDetails, entries: Template[]) {
   const packageJson = join(build.root, "package.json")
   if (!exists(packageJson)) return
   const config = JSON.parse(readFile(packageJson, "utf8"))?.pocket as SiteConfig
@@ -64,9 +73,6 @@ function writeSiteMetadata(build: SiteBuild, site: SiteDetails) {
   writeFile(join(build.root, "sitemap.xml"), buildSitemapXml(build, site, config), "utf8")
   writeFile(join(build.root, "robots.txt"), buildRobotsTxt(build, site, config), "utf8")
 
-  const entries = site.templates
-    .filter(t => !!t.date && t.feed !== false)
-    .sort((a, b) => b.date!.getDate()! - a.date!.getDate())
   if (entries.length > 0) {
     writeFile(join(build.root, "feed.xml"), buildFeedXml(build, entries, config), "utf8")
     writeFile(join(build.root, "feed.json"), buildFeedJson(build, entries, config), "utf8")

@@ -193,7 +193,7 @@ author: "errilaz"
 tags: <[ birthday ]>
 map: true
 feed: true
-page: ({ date, title, author, tags, url, site }) -> div do
+page: ({ date, title, author, tags, url, site, previous, next }) -> div do
   h1 "#title by #author"
 ```
 
@@ -202,6 +202,7 @@ page: ({ date, title, author, tags, url, site }) -> div do
 - `site.templates` contains the metadata for all `.html.ls` templates.
 - `site.authors` contains a list of `{ name, templates }` organized by author.
 - `site.tags` contains a list of `{ name, templates }` organized by tag.
+- `previous` and `next` contain the metadata for adjacent dated pages.
 
 ## Tag Pages
 
