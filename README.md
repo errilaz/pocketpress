@@ -56,17 +56,14 @@ div.red-bold.also-italic "this has two classes!"
 
 ## Styles
 
-Style tags can use the `rule` and `media` block functions, and custom properties with `prop`:
+Style tags can use the `rule` block function, and custom properties with `prop`:
 
 ```ls
 style do
   rule ".red-bold",
     color "red"
     font-weight bold
-  media "(prefers-color-scheme: dark)",
-    rule ":root",
-      prop "--fg" "white"
-      prop "--bg" "black"
+    prop "-some-nonstandard" "value"
 ```
 
 All CSS properties are pre-defined functions. The `continue` property is called `_continue` to work with JS syntax.
@@ -118,6 +115,26 @@ rule "input, textarea",
   border "solid 1px gray"
   rule ":hover, :focus",
     border-color "black"
+```
+
+## At-rules
+
+Media queries and other [at-rules](https://developer.mozilla.org/en-US/docs/Web/CSS/At-rule) are supported
+with the `$` prefix: 
+
+```ls
+$media "(prefers-color-scheme: dark)",
+  rule ":root",
+    prop "--fg" "white"
+    prop "--bg" "black"
+```
+
+Note that all nested at-rules which *may* contain text before the `{` character (all except `@font-face`) **must** provide a second argument before any block contents. An empty string is fine:
+
+```ls
+$layer "",
+  rule "p",
+    color "red"
 ```
 
 ## Layouts & Partials
@@ -215,13 +232,15 @@ livescript """
 """
 ```
 
-## Other features
+## Other functions
 
 `raw` includes un-escaped HTML content.
 
 `elem` creates a custom element with the given tag and contents.
 
 `load-file` synchronously reads a file relative to the current file. You can use `~/` at the start of the path to refer to the site root.
+
+`quote` is a helper to wrap a CSS string in `"` characters and escape the contents.
 
 ## Site Metadata
 

@@ -171,6 +171,7 @@ function defineGlobals() {
   top.markdown = Markup.markdown
   top.livescript = Markup.livescript
   top.document = Markup.document
+  top.quote = Markup.quote
 
   for (const tag of tags) {
     const isVoid = (voids as string[]).includes(tag)

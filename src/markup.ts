@@ -5,6 +5,7 @@ import { readFileSync as readFile } from "fs"
 import { BlockAtRule, Element, NestedAtRule, Property, Raw, RegularAtRule, Rule, SiteBuild } from "./model"
 import { compile, CompileOptions } from "livescript"
 import { run } from "./run"
+import cssesc from "cssesc"
 
 /** Functions for the template DSL. */
 export module Markup {
@@ -157,6 +158,11 @@ export module Markup {
       if (url.endsWith("/")) return root + url + "index.html"
       return root + url
     }
+  }
+
+  /** Escapes and wraps a CSS string. */
+  export function quote(text: string) {
+    return `"${cssesc(text, { quotes: "double" })}"`
   }
 }
 
