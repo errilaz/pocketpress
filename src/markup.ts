@@ -2,7 +2,7 @@
 import { resolve, dirname, join } from "path"
 import { marked } from "marked"
 import { readFileSync as readFile } from "fs"
-import { Element, MediaQuery, Property, Raw, Rule, SiteBuild } from "./model"
+import { BlockAtRule, Element, NestedAtRule, Property, Raw, RegularAtRule, Rule, SiteBuild } from "./model"
 import { compile, CompileOptions } from "livescript"
 import { run } from "./run"
 
@@ -56,10 +56,31 @@ export module Markup {
     }
   }
 
-  /** Factory for Property-returning functions. */
+  /** Factory for named properties. */
   export function property(name: string) {
     return function property(value: any) {
       return new Property(name, value)
+    }
+  }
+
+  /** Factory for regular at-rules. */
+  export function regularAtRule(keyword: string) {
+    return function regularAtRule(rule: string) {
+      return new RegularAtRule(keyword, rule)
+    }
+  }
+
+  /** Factory for nested at-rules. */
+  export function nestedAtRule(keyword: string) {
+    return function nestedAtRule(rule: string, ...contents: any[]) {
+      return new NestedAtRule(keyword, rule, contents)
+    }
+  }
+
+  /** Factory for block at-rules. */
+  export function blockAtRule(keyword: string) {
+    return function blockAtRule(...contents: any[]) {
+      return new BlockAtRule(keyword, contents)
     }
   }
 
@@ -71,11 +92,6 @@ export module Markup {
   /** Custom property helper. */
   export function prop(name: string, value: any) {
     return new Property(name, value)
-  }
-
-  /** Creates a media query. */
-  export function media(query: string, ...rules: Rule[]) {
-    return new MediaQuery(query, rules)
   }
 
   /** Factory for `include` functions. */

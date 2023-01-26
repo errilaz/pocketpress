@@ -7,6 +7,7 @@ import { print } from "./print"
 import { Article, Document, SiteBuild, SiteConfig, SiteDetails, Template } from "./model"
 import { join } from "path"
 import { buildFeedJson, buildFeedXml, buildRobotsTxt, buildSitemapXml } from "./metadata"
+import { atRules } from "./atRules"
 
 const doctype = "<!DOCTYPE html>"
 
@@ -167,7 +168,6 @@ function defineGlobals() {
   top.prop = Markup.prop
   top.elem = Markup.elem
   top.rule = Markup.rule
-  top.media = Markup.media
   top.markdown = Markup.markdown
   top.livescript = Markup.livescript
   top.document = Markup.document
@@ -181,6 +181,10 @@ function defineGlobals() {
   for (const property of properties) {
     const name = camelize(propertyName(property))
     top[name] = Markup.property(property)
+  }
+
+  for (const key of Object.keys(atRules)) {
+    top[key] = atRules[key]
   }
 }
 
