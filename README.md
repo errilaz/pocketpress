@@ -26,11 +26,11 @@ pocket [options]
     -h, --help            Display this message
 ```
 
-Scans a directory tree and transforms `.html.ls` template files into `.html` files.
+Scans a directory tree and transforms `.html.ls` template files into `.html` files, `.css.ls` into `.css`, and `.md.ls` into `.md`.
 
-## Templates
+## HTML Templates
 
-The template fie should end in an object containing a `page` property:
+The `.html.ls` template file should end in an object containing a `page` property:
 
 ```ls
 page:
@@ -135,6 +135,17 @@ Note that all nested at-rules which *may* contain text before the `{` character 
 $layer "",
   rule "p",
     color "red"
+```
+
+## CSS Templates
+
+`.css.ls` files simply use the `stylesheet` function as the top level. Note this must also be the last expression in the file:
+
+```ls
+stylesheet do
+  rule ".danger",
+    color "red"
+    font-weight "bold"
 ```
 
 ## Layouts & Partials

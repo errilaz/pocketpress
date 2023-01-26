@@ -14,6 +14,7 @@ export interface SiteBuild {
 export type Article =
   | Document
   | Template
+  | Stylesheet
 
 export interface Document {
   type: "document"
@@ -36,9 +37,17 @@ export interface Template {
   summary?: string
 }
 
+export interface Stylesheet {
+  type: "stylesheet"
+  path: string
+  url: string
+  content: any
+}
+
 export interface SiteDetails {
   templates: Template[]
   documents: Document[]
+  stylesheets: Stylesheet[]
   authors: Catalog[]
   tags: Catalog[]
 }

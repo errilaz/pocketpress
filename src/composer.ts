@@ -4,7 +4,7 @@ import { all as knownProperties } from "known-css-properties"
 import { Markup } from "./markup"
 import { writeFileSync as writeFile, accessSync as access, constants, readFileSync as readFile } from "fs"
 import { print } from "./print"
-import { Article, Document, SiteBuild, SiteConfig, SiteDetails, Template } from "./model"
+import { Article, Document, SiteBuild, SiteConfig, SiteDetails, Stylesheet, Template } from "./model"
 import { join } from "path"
 import { buildFeedJson, buildFeedXml, buildRobotsTxt, buildSitemapXml } from "./metadata"
 import { atRules } from "./atRules"
@@ -20,6 +20,7 @@ function compose(build: SiteBuild) {
   const site: SiteDetails = {
     templates: articles.filter(a => a.type === "template") as Template[],
     documents: articles.filter(a => a.type === "document") as Document[],
+    stylesheets: articles.filter(a => a.type === "stylesheet") as Stylesheet[],
     ...buildDetails(articles)
   }
   if (tagTemplate) {
@@ -28,7 +29,7 @@ function compose(build: SiteBuild) {
   for (const article of articles) {
     try {
       const target = article.path.substring(0, article.path.length - 3)
-      if (article.type === "document") {
+      if (article.type !== "template") {
         writeFile(target, print(article.content), "utf8")
         continue
       }
@@ -90,7 +91,10 @@ function compileArticles(build: SiteBuild): [Article[], string | null] {
         }
         articles.push({ type: "template", path, url, ...result })
       }
-      else {
+      else if (path.endsWith(".css.ls")) {
+        articles.push({ type: "stylesheet", path, url, content: result })
+      }
+      else if (path.endsWith(".md.ls")) {
         articles.push({ type: "document", path, url, content: result })
       }
     }
@@ -121,7 +125,7 @@ function buildDetails(articles: Article[]): Pick<SiteDetails, "tags" | "authors"
   const tags: { [name: string]: Article[] } = {}
   const authors: { [name: string]: Article[] } = {}
   for (const article of articles) {
-    if (article.type === "document") continue
+    if (article.type !== "template") continue
     if (article.tags) {
       for (const tag of article.tags) {
         if (!tags[tag]) tags[tag] = []
@@ -171,6 +175,7 @@ function defineGlobals() {
   top.markdown = Markup.markdown
   top.livescript = Markup.livescript
   top.document = Markup.document
+  top.stylesheet = Markup.stylesheet
   top.quote = Markup.quote
 
   for (const tag of tags) {

@@ -5,7 +5,7 @@ import { build } from "./build"
 
 /** Starts a chokidar watch to build on changes. */
 export async function watcher(root: string, excludes: string[]) {
-  const ignored = [...excludes, "**/*.html", ".live-reload.js"]
+  const ignored = [...excludes, "**/*.html", "**/*.css", ".live-reload.js"]
   const composer = await build(root!, !!watch, excludes)
   console.log("built site")
   await writeFile(join(root, ".live-reload.js"), liveReload(), "utf8")

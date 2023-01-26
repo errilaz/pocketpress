@@ -147,6 +147,11 @@ export module Markup {
       [...contents, raw("\n\n"), content], [])
   }
 
+  /** Pass-through stylesheet objects. */
+  export function stylesheet(...contents: any[]) {
+    return contents
+  }
+
   /** Returns `link-to` function with provided `root`. */
   export function linkToFrom(root: string, watch: boolean) {
     /** Given root-relative url, creates a URL that will work in local watch mode, where a trailing `/` will append `index.html`. */
