@@ -9,7 +9,10 @@ export async function build(root: string, output: string, watch: boolean, exclud
 
   if (!composer) {
     composer = fork(join(__dirname, "composer"), {
-      stdio: "inherit"
+      stdio: "inherit",
+      env: {
+        NODE_PATH: process.env.POCKET_DEV === "true" ? `${process.env.NODE_PATH}:${root}/node_modules` : process.env.NODE_PATH
+      }
     })
   }
 

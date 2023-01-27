@@ -34,8 +34,10 @@ export function buildFeedXml(build: SiteBuild, entries: Template[], config: Site
     <id>${config.baseUrl}${url}</id>
     <title>${escapeHtml(title)}</title>
     <summary>${escapeHtml(summary)}</summary>
+    <link>${config.baseUrl}${trimIndex(url)}</link>
     <updated>${date!.toISOString()}</updated>
-    <content>${config.baseUrl}${trimIndex(url)}</content>
+    <content type="html">
+      ${escapeHtml(`${summary}<br><br><a href="${config.baseUrl}${trimIndex(url)}">Read more</a>`)}</content>
     <author><name>${author || "Unknown"}</name></author>
   </entry>`).join("\n")}${tail}` 
 }
