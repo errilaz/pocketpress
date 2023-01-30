@@ -66,7 +66,8 @@ style do
     prop "-some-nonstandard" "value"
 ```
 
-All CSS properties are pre-defined functions. The `continue` property is called `_continue` to work with JS syntax.
+All CSS properties are pre-defined functions. The `continue` property is called `_continue` to work with JS syntax. Known
+vendor-specific properties are also available (without the leading `-`).
 
 ## Inline Styles
 

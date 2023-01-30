@@ -1,6 +1,6 @@
 import tags from "html-tags"
 import voids from "html-tags/void"
-import { all as knownProperties } from "known-css-properties"
+import { all as properties } from "known-css-properties"
 import { Markup } from "./markup"
 import { writeFileSync, mkdirSync, accessSync, constants, readFileSync } from "fs"
 import { print } from "./print"
@@ -167,9 +167,6 @@ function report(context: string, build: SiteBuild, path: string, e: any) {
 
 /** Clashes with LS/JS names. */
 const reserved = ["var", "continue"]
-
-/** Disable epub properties (for now). */
-const properties = knownProperties.filter(p => !p.startsWith("epub"))
 
 /** Creates global variables for functions to create HTML elements and CSS properties. */
 function defineGlobals() {
