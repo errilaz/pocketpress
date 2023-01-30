@@ -155,11 +155,11 @@ export class RegularAtRule extends AtRule {
 /** Represents at-rules which may have both a rule and a block syntax (such as `@media`). */
 export class NestedAtRule extends AtRule {
   keyword: string
-  rule: string
+  rule: string | null
   properties: { [name: string]: string } = {}
   contents: any[] = []
 
-  constructor(keyword: string, rule: string, contents: any[]) {
+  constructor(keyword: string, rule: string | null, contents: any[]) {
     super()
     this.keyword = keyword
     this.rule = rule

@@ -188,4 +188,14 @@ describe("print", () => {
     expect(output).toBe("@counter-style thumbs{system:cyclic}")
   })
 
+  it("renders nested at-rules without a rule", () => {
+    const output = print(new NestedAtRule("layer", null, [
+      new Rule("p", [
+        new Property("color", "red")
+      ])
+    ]))
+
+    expect(output).toBe("@layer{p{color:red}}")
+  })
+
 })

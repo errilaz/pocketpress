@@ -73,7 +73,12 @@ export module Markup {
 
   /** Factory for nested at-rules. */
   export function nestedAtRule(keyword: string) {
-    return function nestedAtRule(rule: string, ...contents: any[]) {
+    return function nestedAtRule(...contents: any[]) {
+      let rule = null
+      if (typeof contents[0] === "string") {
+        rule = contents[0]
+        contents = contents.slice(1)
+      }
       return new NestedAtRule(keyword, rule, contents)
     }
   }

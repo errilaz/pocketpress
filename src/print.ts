@@ -61,7 +61,10 @@ function printNode(x: any, p: Printer) {
       break
     }
     case x instanceof NestedAtRule: {
-      p.text += `@${x.keyword} ${x.rule}`
+      p.text += `@${x.keyword}`
+      if (x.rule !== null) {
+        p.text += ` ${x.rule}`
+      }
       if (x.contents.length === 0 && Object.keys(x.properties).length === 0) {
         p.text += ";"
         break

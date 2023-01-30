@@ -2,7 +2,7 @@
 
 > An extremely static site generator
 
-PocketPress is a little zero-config SSG that produces HTML/CSS from a [LiveScript](https://livescript.net)-based DSL. It is meant to create simple sites quickly.
+PocketPress is a little zero-config SSG that produces HTML/CSS from a [LiveScript](https://livescript.net)-based DSL.
 
 ## Install
 
@@ -129,10 +129,8 @@ $media "(prefers-color-scheme: dark)",
     prop "--bg" "black"
 ```
 
-Note that all nested at-rules which *may* contain text before the `{` character (all except `@font-face`) **must** provide a second argument before any block contents. An empty string is fine:
-
 ```ls
-$layer "",
+$layer do
   rule "p",
     color "red"
 ```
