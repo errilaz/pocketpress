@@ -38,7 +38,7 @@ function printNode(x: any, p: Printer) {
       if (attributes.length > 0) p.text += " " + attributes
       const properties = Object.keys(x.properties)
         .map(key => `${key}: ${x.properties[key]}`)
-        .join("; ")
+        .join(";")
       if (properties.length > 0) {
         p.text += ` style="${properties}"`
       }
@@ -67,8 +67,8 @@ function printNode(x: any, p: Printer) {
       }
       p.text += "{"
       p.text += Object.keys(x.properties)
-        .map(key => `${key}:${x.properties[key]};`)
-        .join("")
+        .map(key => `${key}:${x.properties[key]}`)
+        .join(";")
       for (const content of x.contents) {
         printNode(content, p)
       }
@@ -98,8 +98,8 @@ function printRule(rule: Rule, p: Printer, prefix?: string) {
   if (keys.length > 0) {
     p.text += `${selectors.join(",")}{`
     p.text += Object.keys(rule.properties)
-      .map(key => `${key}:${rule.properties[key]};`)
-      .join("")
+      .map(key => `${key}:${rule.properties[key]}`)
+      .join(";")
     p.text += `}`
   }
 

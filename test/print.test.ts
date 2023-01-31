@@ -49,7 +49,7 @@ describe("print", () => {
       new Property("background", "blue")
     ]))
 
-    expect(output).toBe(".foo{color:red;background:blue;}")
+    expect(output).toBe(".foo{color:red;background:blue}")
   })
 
   it("renders nested rules", () => {
@@ -60,7 +60,7 @@ describe("print", () => {
       ])
     ]))
 
-    expect(output).toBe(".foo{color:red;}.foo .bar{color:blue;}")
+    expect(output).toBe(".foo{color:red}.foo .bar{color:blue}")
   })
 
   it("renders only nested rule when parent has no properties", () => {
@@ -70,7 +70,7 @@ describe("print", () => {
       ])
     ]))
 
-    expect(output).toBe(".foo .bar{color:blue;}")
+    expect(output).toBe(".foo .bar{color:blue}")
   })
 
   it("renders combined nested rules", () => {
@@ -80,7 +80,7 @@ describe("print", () => {
       ])
     ]))
 
-    expect(output).toBe(".foo.bar{color:blue;}")
+    expect(output).toBe(".foo.bar{color:blue}")
   })
 
   it("renders nested rules with pseudo-classes", () => {
@@ -91,7 +91,7 @@ describe("print", () => {
       ])
     ]))
 
-    expect(output).toBe(".foo{color:red;}.foo:hover{color:blue;}")
+    expect(output).toBe(".foo{color:red}.foo:hover{color:blue}")
   })
 
   it("renders nested rules with multiple selectors in parent", () => {
@@ -102,7 +102,7 @@ describe("print", () => {
       ])
     ]))
 
-    expect(output).toBe(".foo,.bar{color:red;}.foo .baz{color:green;}.bar .baz{color:green;}")
+    expect(output).toBe(".foo,.bar{color:red}.foo .baz{color:green}.bar .baz{color:green}")
   })
 
   it("renders nested rules with multiple selectors in child", () => {
@@ -112,7 +112,7 @@ describe("print", () => {
       ])
     ]))
 
-    expect(output).toBe(".foo .bar,.foo .baz{color:purple;}")
+    expect(output).toBe(".foo .bar,.foo .baz{color:purple}")
   })
 
   it("renders nested rules with multiple selectors at both levels", () => {
@@ -122,7 +122,7 @@ describe("print", () => {
       ])
     ]))
 
-    expect(output).toBe(".foo .baz,.foo .buz{color:green;}.bar .baz,.bar .buz{color:green;}")
+    expect(output).toBe(".foo .baz,.foo .buz{color:green}.bar .baz,.bar .buz{color:green}")
   })
 
   it("renders regular at-rules", () => {
@@ -136,7 +136,7 @@ describe("print", () => {
       new Property("font-family", `"Consolas"`)
     ]))
 
-    expect(output).toBe(`@font-face{font-family:"Consolas";}`)
+    expect(output).toBe(`@font-face{font-family:"Consolas"}`)
   })
 
   it("renders nested at-rules containing rules", () => {
@@ -146,7 +146,7 @@ describe("print", () => {
       ])
     ]))
 
-    expect(output).toBe("@media (min-width: 600px){.foo{color:red;}}")
+    expect(output).toBe("@media (min-width: 600px){.foo{color:red}}")
   })
 
   it("renders nested at-rules containing nested rules", () => {
@@ -159,7 +159,7 @@ describe("print", () => {
       ])
     ]))
 
-    expect(output).toBe("@media (min-width: 600px){.foo{color:red;}.foo .bar{color:blue;}}")
+    expect(output).toBe("@media (min-width: 600px){.foo{color:red}.foo .bar{color:blue}}")
   })
 
   it("renders nested at-rules nested inside other nested at-rule", () => {
@@ -171,7 +171,7 @@ describe("print", () => {
       ])
     ]))
 
-    expect(output).toBe("@supports (display: flex){@media (min-width: 900px){.foo{display:flex;}}}")
+    expect(output).toBe("@supports (display: flex){@media (min-width: 900px){.foo{display:flex}}}")
   })
 
   it("renders nested at-rules without contents", () => {
@@ -185,7 +185,7 @@ describe("print", () => {
       new Property("system", "cyclic")
     ]))
 
-    expect(output).toBe("@counter-style thumbs{system:cyclic;}")
+    expect(output).toBe("@counter-style thumbs{system:cyclic}")
   })
 
   it("renders nested at-rules without a rule", () => {
@@ -195,7 +195,7 @@ describe("print", () => {
       ])
     ]))
 
-    expect(output).toBe("@layer{p{color:red;}}")
+    expect(output).toBe("@layer{p{color:red}}")
   })
 
 })
