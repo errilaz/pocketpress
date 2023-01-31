@@ -1,4 +1,4 @@
-import { writeFileSync, mkdirSync, accessSync, constants, readFileSync } from "fs"
+import { writeFile, mkdir, access, constants, readFile } from "fs/promises"
 import { print } from "./print"
 import { Article, Document, SiteBuild, SiteConfig, SiteDetails, Stylesheet, Template } from "./model"
 import { dirname, join } from "path"
@@ -8,7 +8,7 @@ import { createTemplate } from "./createTemplate"
 const doctype = "<!DOCTYPE html>"
 
 /** Renders templates, producing markup. */
-export function render(build: SiteBuild) {
+export async function render(build: SiteBuild) {
   const [articles, tagTemplate] = compileArticles(build)
   const site: SiteDetails = {
     templates: articles.filter(a => a.type === "template") as Template[],
@@ -22,11 +22,13 @@ export function render(build: SiteBuild) {
   if (tagTemplate) {
     articles.push(...compileTagArticles(tagTemplate, build, site))
   }
+
+  const renders: Promise<void>[] = []
   for (const article of articles) {
     try {
       const target = join(build.output, article.path.substring(build.root.length, article.path.length - 3))
       if (article.type !== "template") {
-        writeFile(target, print(article.content))
+        renders.push(write(target, print(article.content)))
         continue
       }
       const meta: any = { ...article, site }
@@ -40,28 +42,29 @@ export function render(build: SiteBuild) {
         : article.page
       const markup = print(page)
       const output = `${doctype}\n${markup}`
-      writeFile(target, output)
+      renders.push(write(target, output))
     }
     catch (e) {
       report("Runtime", build, article.path, e)
     }
   }
 
-  writeSiteMetadata(build, site, entries)
+  await Promise.all(renders)
+  await writeSiteMetadata(build, site, entries)
 }
 
-function writeSiteMetadata(build: SiteBuild, site: SiteDetails, entries: Template[]) {
+async function writeSiteMetadata(build: SiteBuild, site: SiteDetails, entries: Template[]) {
   const packageJson = join(build.root, "package.json")
   if (!exists(packageJson)) return
-  const config = JSON.parse(readFile(packageJson))?.pocket as SiteConfig
+  const config = JSON.parse(await read(packageJson))?.pocket as SiteConfig
   if (!config || !config.baseUrl) return
 
-  writeFile(join(build.output, "sitemap.xml"), buildSitemapXml(build, site, config))
-  writeFile(join(build.output, "robots.txt"), buildRobotsTxt(build, site, config))
+  await write(join(build.output, "sitemap.xml"), buildSitemapXml(build, site, config))
+  await write(join(build.output, "robots.txt"), buildRobotsTxt(build, site, config))
 
   if (entries.length > 0) {
-    writeFile(join(build.output, "feed.xml"), buildFeedXml(build, entries, config))
-    writeFile(join(build.output, "feed.json"), buildFeedJson(build, entries, config))
+    await write(join(build.output, "feed.xml"), buildFeedXml(build, entries, config))
+    await write(join(build.output, "feed.json"), buildFeedJson(build, entries, config))
   }
 }
 
@@ -151,22 +154,22 @@ function report(context: string, build: SiteBuild, path: string, e: any) {
   }
 }
 
-function exists(path: string) {
+async function exists(path: string) {
   try {
-    accessSync(path, constants.F_OK)
+    await access(path, constants.F_OK)
     return true
   }
   catch { return false }
 }
 
-function writeFile(path: string, data: string) {
+async function write(path: string, data: string) {
   const dir = dirname(path)
   if (!exists(dir)) {
-    mkdirSync(dir, { recursive: true })
+    await mkdir(dir, { recursive: true })
   }
-  writeFileSync(path, data, "utf8")
+  await writeFile(path, data, "utf8")
 }
 
-function readFile(path: string) {
-  return readFileSync(path, "utf8")
+async function read(path: string) {
+  return readFile(path, "utf8")
 }

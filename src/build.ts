@@ -5,7 +5,7 @@ import { render } from "./render"
 /** Scans the site directory, collecting template paths and rendering. */
 export async function build(root: string, output: string, watch: boolean, excludes: string[]) {
   const templates = await scan(root, excludes)
-  render({ root, output, watch, templates })
+  await render({ root, output, watch, templates })
 }
 
 async function scan(root: string, excludes: string[]) {
