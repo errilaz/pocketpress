@@ -21,8 +21,6 @@ dependencies:
   chokidar: 3.5.3
   cssesc: 3.0.0
   escape-html: 1.0.3
-  html-tags: 3.2.0
-  known-css-properties: 0.26.0
   livescript: 1.6.0
   marked: 4.2.5
   toptions: 1.0.2
@@ -32,6 +30,8 @@ devDependencies:
   '@types/escape-html': 1.0.2
   '@types/marked': 4.0.8
   '@types/node': 18.11.18
+  html-tags: 3.2.0
+  known-css-properties: 0.26.0
   ts-node: 10.9.1_rfpznlfhiluh5p3hm2qa4rsc5i
   typescript: 4.6.2
   vitest: 0.28.2
@@ -568,7 +568,7 @@ packages:
   /html-tags/3.2.0:
     resolution: {integrity: sha512-vy7ClnArOZwCnqZgvv+ddgHgJiAFXe3Ge9ML5/mBctVJoUoYPCdxVucOywjDARn6CVoh3dRSFdPHy2sX80L0Wg==}
     engines: {node: '>=8'}
-    dev: false
+    dev: true
 
   /is-binary-path/2.1.0:
     resolution: {integrity: sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==}
@@ -611,7 +611,7 @@ packages:
 
   /known-css-properties/0.26.0:
     resolution: {integrity: sha512-5FZRzrZzNTBruuurWpvZnvP9pum+fe0HcK8z/ooo+U+Hmp4vtbyp1/QDsqmufirXy4egGzbaH/y2uCZf+6W5Kg==}
-    dev: false
+    dev: true
 
   /levn/0.3.0:
     resolution: {integrity: sha512-0OO4y2iOHix2W6ujICbKIaEQXvFQHue65vUG3pb5EUomzPI90z9hsA1VsO/dbIIpC53J8gxM9Q4Oho0jrCM/yA==}
