@@ -1,32 +1,11 @@
 import { readdir, stat } from "fs/promises"
 import { join } from "path"
-import { ChildProcess, fork } from "child_process"
+import { render } from "./render"
 
-/** Scans the site directory, collecting template paths and sending them to spawned composer process. */
-export async function build(root: string, output: string, watch: boolean, excludes: string[], composer?: ChildProcess) {
+/** Scans the site directory, collecting template paths and rendering. */
+export async function build(root: string, output: string, watch: boolean, excludes: string[]) {
   const templates = await scan(root, excludes)
-
-  if (!composer) {
-    composer = fork(join(__dirname, "composer"), {
-      stdio: "inherit",
-      env: {
-        NODE_PATH: `${process.env.NODE_PATH}:${root}/node_modules`
-      }
-    })
-  }
-
-  composer.send({ root, output, watch, templates })
-
-  await new Promise<void>(resolve => {
-    composer!.on(watch ? "message" : "close", complete)
-
-    function complete() {
-      composer!.off(watch ? "message" : "close", complete)
-      resolve()
-    }
-  })
-
-  return composer
+  render({ root, output, watch, templates })
 }
 
 async function scan(root: string, excludes: string[]) {

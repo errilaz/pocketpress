@@ -4,20 +4,11 @@ import { marked } from "marked"
 import { readFileSync as readFile } from "fs"
 import { AtRule, Element, Property, Raw, Rule, SiteBuild } from "./model"
 import { compile, CompileOptions } from "livescript"
-import { run } from "./run"
 import cssesc from "cssesc"
+import { createTemplate } from "./createTemplate"
 
 /** Functions for the template DSL. */
 export module Markup {
-  /** Compile a template and return a function which runs it. */
-  export function template(path: string, site: SiteBuild) {
-    let contents = readFile(path, "utf8")
-    if (/^\s*$/.test(contents)) contents = `""`
-    const ls = `return (${contents})`
-    const js = compile(ls, { header: false, filename: path })
-    return () => run(js, path, site)
-  }
-
   /** Constructs a CSS rule. */
   export function rule(selector: string, ...contents: (Property | Rule)[]) {
     return new Rule(selector, contents)
@@ -90,7 +81,7 @@ export module Markup {
   export function includeFrom(context: string, site: SiteBuild) {
     return function include(file: string) {
       const path = siteResolve(context, file, site.root)
-      return template(path, site)()
+      return createTemplate(path, site)()
     }
   }
 

@@ -1,23 +1,14 @@
-import tags from "html-tags"
-import voids from "html-tags/void"
-import { all as properties } from "known-css-properties"
-import { Markup } from "./markup"
 import { writeFileSync, mkdirSync, accessSync, constants, readFileSync } from "fs"
 import { print } from "./print"
 import { Article, Document, SiteBuild, SiteConfig, SiteDetails, Stylesheet, Template } from "./model"
 import { dirname, join } from "path"
 import { buildFeedJson, buildFeedXml, buildRobotsTxt, buildSitemapXml } from "./metadata"
+import { createTemplate } from "./createTemplate"
 
 const doctype = "<!DOCTYPE html>"
 
-/** Clashes with LS/JS names. */
-const reserved = ["var", "continue"]
-defineGlobals()
-
-process.on("message", (site: SiteBuild) => compose(site))
-
-/** Receives build configuration from `build.ts` and runs the templates, producing markup. */
-function compose(build: SiteBuild) {
+/** Renders templates, producing markup. */
+export function render(build: SiteBuild) {
   const [articles, tagTemplate] = compileArticles(build)
   const site: SiteDetails = {
     templates: articles.filter(a => a.type === "template") as Template[],
@@ -57,13 +48,6 @@ function compose(build: SiteBuild) {
   }
 
   writeSiteMetadata(build, site, entries)
-
-  if (build.watch) {
-    process.send!("done")
-  }
-  else {
-    process.exit(0)
-  }
 }
 
 function writeSiteMetadata(build: SiteBuild, site: SiteDetails, entries: Template[]) {
@@ -91,7 +75,7 @@ function compileArticles(build: SiteBuild): [Article[], string | null] {
         continue
       }
       const url = path.substring(build.root.length, path.length - 3)
-      const template = Markup.template(path, build)
+      const template = createTemplate(path, build)
       const result = template()
       if (path.endsWith(".html.ls")) {
         if (result.date) {
@@ -114,7 +98,7 @@ function compileArticles(build: SiteBuild): [Article[], string | null] {
 }
 
 function compileTagArticles(tagTemplate: string, build: SiteBuild, site: SiteDetails) {
-  const template = Markup.template(tagTemplate, build)
+  const template = createTemplate(tagTemplate, build)
   return site.tags.map(tag => {
     try {
       const path = tagTemplate.replace("[tag]", tag.name)
@@ -165,47 +149,6 @@ function report(context: string, build: SiteBuild, path: string, e: any) {
   if (!build.watch) {
     process.exit(1)
   }
-}
-
-/** Creates global variables for functions to create HTML elements and CSS properties. */
-function defineGlobals() {
-  const top = global as any
-  top.raw = Markup.raw
-  top.prop = Markup.prop
-  top.elem = Markup.elem
-  top.rule = Markup.rule
-  top.markdown = Markup.markdown
-  top.livescript = Markup.livescript
-  top.document = Markup.document
-  top.stylesheet = Markup.stylesheet
-  top.quote = Markup.quote
-
-  for (const tag of tags) {
-    const isVoid = (voids as string[]).includes(tag)
-    const name = reserved.includes(tag) ? `_${tag}` : tag
-    top[name] = Markup.element(tag, isVoid)
-  }
-
-  for (const property of properties) {
-    const name = camelize(propertyName(property))
-    top[name] = Markup.property(property)
-  }
-}
-
-/** Formats a property variable name. */
-function propertyName(property: string) {
-  switch (true) {
-    case reserved.includes(property):
-      return `_${property}`
-    case property.startsWith("-"):
-      return property.substring(1)
-  }
-  return property
-}
-
-/** Turn a kebab-case name into camelCase. */
-function camelize(kebab: string) {
-  return kebab.replace(/-[a-z]/g, ([, c]) => c.toUpperCase());
 }
 
 function exists(path: string) {

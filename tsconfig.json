@@ -16,5 +16,9 @@
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": false,
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": [
+    "src/generateRun.ts",
+    "src/runTemplate.ts"
+  ]
 }
