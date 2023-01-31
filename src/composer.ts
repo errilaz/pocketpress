@@ -11,11 +11,14 @@ import { atRules } from "./atRules"
 
 const doctype = "<!DOCTYPE html>"
 
+/** Clashes with LS/JS names. */
+const reserved = ["var", "continue"]
+defineGlobals()
+
 process.on("message", (site: SiteBuild) => compose(site))
 
 /** Receives build configuration from `build.ts` and runs the templates, producing markup. */
 function compose(build: SiteBuild) {
-  defineGlobals()
   const [articles, tagTemplate] = compileArticles(build)
   const site: SiteDetails = {
     templates: articles.filter(a => a.type === "template") as Template[],
@@ -164,9 +167,6 @@ function report(context: string, build: SiteBuild, path: string, e: any) {
     process.exit(1)
   }
 }
-
-/** Clashes with LS/JS names. */
-const reserved = ["var", "continue"]
 
 /** Creates global variables for functions to create HTML elements and CSS properties. */
 function defineGlobals() {

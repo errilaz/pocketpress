@@ -15,9 +15,11 @@ export async function watcher(root: string, output: string, excludes: string[]) 
     cwd: root,
   }).on("all", async (event, path) => {
     console.log(path, `${event}d`)
+    const start = performance.now()
     await build(root, output, !!watch, excludes, composer)
     await writeFile(join(root, ".live-reload.js"), liveReload(), "utf8")
-    console.log("rebuilt site")
+    const duration = (performance.now() - start).toFixed(2)
+    console.log(`rebuilt site in ${duration}ms`)
   })
 }
 

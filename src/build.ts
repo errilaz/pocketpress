@@ -4,14 +4,13 @@ import { ChildProcess, fork } from "child_process"
 
 /** Scans the site directory, collecting template paths and sending them to spawned composer process. */
 export async function build(root: string, output: string, watch: boolean, excludes: string[], composer?: ChildProcess) {
-  const templates: string[] = []
-  await scanDir(root)
+  const templates = await scan(root, excludes)
 
   if (!composer) {
     composer = fork(join(__dirname, "composer"), {
       stdio: "inherit",
       env: {
-        NODE_PATH: process.env.POCKET_DEV === "true" ? `${process.env.NODE_PATH}:${root}/node_modules` : process.env.NODE_PATH
+        NODE_PATH: `${process.env.NODE_PATH}:${root}/node_modules`
       }
     })
   }
@@ -19,10 +18,21 @@ export async function build(root: string, output: string, watch: boolean, exclud
   composer.send({ root, output, watch, templates })
 
   await new Promise<void>(resolve => {
-    composer!.once(watch ? "message" : "close", () => resolve())
+    composer!.on(watch ? "message" : "close", complete)
+
+    function complete() {
+      composer!.off(watch ? "message" : "close", complete)
+      resolve()
+    }
   })
 
   return composer
+}
+
+async function scan(root: string, excludes: string[]) {
+  const templates: string[] = []
+  await scanDir(root)
+  return templates
 
   /** Recursively look for `.html.ls` files. */
   async function scanDir(dir: string) {
