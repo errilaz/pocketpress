@@ -19,6 +19,7 @@
     "pocket": "./bin/pocket"
   },
   "scripts": {
+    "generate-run": "ts-node --skipProject src/generateRun.ts",
     "build": "tsc --project .",
     "clean": "rm -rf lib",
     "test": "vitest"
