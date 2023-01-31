@@ -27,6 +27,11 @@ const excludes = [
   "node_modules",
 ].map(dir => resolve(root, dir))
 
+process.env.NODE_PATH = `${process.env.NODE_PATH}:${root}/node_modules`
+if (process.env.POCKET_DEV !== "bun") {
+  require("module").Module._initPaths()
+}
+
 if (!watch) {
   build(root, out, !!watch, excludes)
     .catch(e => { console.error(e); process.exit(1) })

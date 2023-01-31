@@ -137,30 +137,14 @@ export class Rule {
   }
 }
 
-/** Base class (for `instanceof` purposes). */
-export class AtRule {}
-
-/** Represents at-rules with a property-like syntax (such as `@charset`). */
-export class RegularAtRule extends AtRule {
-  keyword: string
-  rule: string
-
-  constructor(keyword: string, rule: string) {
-    super()
-    this.keyword = keyword
-    this.rule = rule
-  }
-}
-
-/** Represents at-rules which may have both a rule and a block syntax (such as `@media`). */
-export class NestedAtRule extends AtRule {
+/** Represents at-rules. */
+export class AtRule {
   keyword: string
   rule: string | null
   properties: { [name: string]: string } = {}
   contents: any[] = []
 
   constructor(keyword: string, rule: string | null, contents: any[]) {
-    super()
     this.keyword = keyword
     this.rule = rule
     for (const content of contents) {
@@ -175,24 +159,6 @@ export class NestedAtRule extends AtRule {
     else {
       this.contents.push(content)
     }
-  }
-}
-
-/** Represets at-rules which have a block but no rule syntax (such as `@font-face`). */
-export class BlockAtRule extends AtRule {
-  keyword: string
-  properties: { [name: string]: string } = {}
-
-  constructor(keyword: string, properties: Property[]) {
-    super()
-    this.keyword = keyword
-    for (const property of properties) {
-      this.add(property)
-    }
-  }
-
-  add(content: Property) {
-    this.properties[content.name] = content.value
   }
 }
 

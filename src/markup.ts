@@ -2,22 +2,13 @@
 import { resolve, dirname, join } from "path"
 import { marked } from "marked"
 import { readFileSync as readFile } from "fs"
-import { BlockAtRule, Element, NestedAtRule, Property, Raw, RegularAtRule, Rule, SiteBuild } from "./model"
+import { AtRule, Element, Property, Raw, Rule, SiteBuild } from "./model"
 import { compile, CompileOptions } from "livescript"
-import { run } from "./run"
 import cssesc from "cssesc"
+import { createTemplate } from "./createTemplate"
 
 /** Functions for the template DSL. */
 export module Markup {
-  /** Compile a template and return a function which runs it. */
-  export function template(path: string, site: SiteBuild) {
-    let contents = readFile(path, "utf8")
-    if (/^\s*$/.test(contents)) contents = `""`
-    const ls = `return (${contents})`
-    const js = compile(ls, { header: false, filename: path })
-    return () => run(js, path, site)
-  }
-
   /** Constructs a CSS rule. */
   export function rule(selector: string, ...contents: (Property | Rule)[]) {
     return new Rule(selector, contents)
@@ -64,29 +55,15 @@ export module Markup {
     }
   }
 
-  /** Factory for regular at-rules. */
-  export function regularAtRule(keyword: string) {
-    return function regularAtRule(rule: string) {
-      return new RegularAtRule(keyword, rule)
-    }
-  }
-
-  /** Factory for nested at-rules. */
-  export function nestedAtRule(keyword: string) {
+  /** Factory at-rules. */
+  export function atRule(keyword: string) {
     return function nestedAtRule(...contents: any[]) {
       let rule = null
       if (typeof contents[0] === "string") {
         rule = contents[0]
         contents = contents.slice(1)
       }
-      return new NestedAtRule(keyword, rule, contents)
-    }
-  }
-
-  /** Factory for block at-rules. */
-  export function blockAtRule(keyword: string) {
-    return function blockAtRule(...contents: any[]) {
-      return new BlockAtRule(keyword, contents)
+      return new AtRule(keyword, rule, contents)
     }
   }
 
@@ -104,7 +81,7 @@ export module Markup {
   export function includeFrom(context: string, site: SiteBuild) {
     return function include(file: string) {
       const path = siteResolve(context, file, site.root)
-      return template(path, site)()
+      return createTemplate(path, site)()
     }
   }
 

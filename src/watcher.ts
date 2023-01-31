@@ -6,18 +6,21 @@ import { build } from "./build"
 /** Starts a chokidar watch to build on changes. */
 export async function watcher(root: string, output: string, excludes: string[]) {
   const ignored = [...excludes, "**/*.html", "**/*.css", ".live-reload.js"]
-  const composer = await build(root, output, !!watch, excludes)
+  await build(root, output, !!watch, excludes)
   console.log("built site")
   await writeFile(join(root, ".live-reload.js"), liveReload(), "utf8")
   watch(`${root}/**/*.ls`, {
     ignored,
     ignoreInitial: true,
     cwd: root,
+    usePolling: true,
   }).on("all", async (event, path) => {
     console.log(path, `${event}d`)
-    await build(root, output, !!watch, excludes, composer)
+    const start = performance.now()
+    await build(root, output, !!watch, excludes)
     await writeFile(join(root, ".live-reload.js"), liveReload(), "utf8")
-    console.log("rebuilt site")
+    const duration = (performance.now() - start).toFixed(2)
+    console.log(`rebuilt site in ${duration}ms`)
   })
 }
 
