@@ -15,6 +15,7 @@ specifiers:
   toptions: ^1.0.2
   ts-node: 10.9.1
   typescript: 4.6.2
+  vite: ^4.0.4
   vitest: ^0.28.2
 
 dependencies:
@@ -34,6 +35,7 @@ devDependencies:
   known-css-properties: 0.26.0
   ts-node: 10.9.1_rfpznlfhiluh5p3hm2qa4rsc5i
   typescript: 4.6.2
+  vite: 4.0.4_@types+node@18.11.18
   vitest: 0.28.2
 
 packages:

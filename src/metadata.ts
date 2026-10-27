@@ -4,7 +4,7 @@ import { SiteBuild, SiteConfig, SiteDetails, Template } from "./model"
 export function buildSitemapXml(build: SiteBuild, site: SiteDetails, config: SiteConfig) {
   const [head, tail] = siteMapEnvelope
   return `${head}${site.templates.filter(t => !!t.map).map(({ url }) => `  <url>
-    <loc>${config.baseUrl}${trimIndex(url)}</loc>
+    <loc>${escapeHtml(config.baseUrl + trimIndex(url))}</loc>
   </url>`).join("\n")}${tail}`
 }
 
@@ -38,7 +38,7 @@ export function buildFeedXml(build: SiteBuild, entries: Template[], config: Site
     <updated>${date!.toISOString()}</updated>
     <content type="html">
       ${escapeHtml(`${summary}<br><br><a href="${config.baseUrl}${trimIndex(url)}">Read more</a>`)}</content>
-    <author><name>${author || "Unknown"}</name></author>
+    <author><name>${escapeHtml(author || "Unknown")}</name></author>
   </entry>`).join("\n")}${tail}` 
 }
 

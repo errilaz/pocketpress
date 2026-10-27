@@ -33,14 +33,14 @@ function printNode(x: any, p: Printer) {
     case x instanceof Element: {
       p.text += `<${x.tag}`
       const attributes = Object.keys(x.attributes)
-        .map(key => `${key}="${x.attributes[key]}"`)
+        .map(key => `${key}="${escape(x.attributes[key])}"`)
         .join(" ")
       if (attributes.length > 0) p.text += " " + attributes
       const properties = Object.keys(x.properties)
         .map(key => `${key}: ${x.properties[key]}`)
         .join(";")
       if (properties.length > 0) {
-        p.text += ` style="${properties}"`
+        p.text += ` style="${escape(properties)}"`
       }
       p.text += `>`
       if (x.isVoid) {

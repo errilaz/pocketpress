@@ -199,3 +199,75 @@ describe("print", () => {
   })
 
 })
+
+describe("print content boundaries", () => {
+  it.each([undefined, null, false, ""])("omits empty content %s", value => {
+    expect(print(value)).toBe("")
+    expect(print(new Element("p", false, [value]))).toBe("<p></p>")
+  })
+
+  it.each([[0, "0"], [true, "true"], [42, "42"], [BigInt(123), "123"]])(
+    "preserves scalar content %s", (value, expected) => {
+      expect(print(value)).toBe(expected)
+      expect(print(new Element("p", false, [value]))).toBe(`<p>${expected}</p>`)
+    },
+  )
+
+  it("flattens nested content arrays while retaining order", () => {
+    expect(print(["one", [null, new Element("b", false, ["two"]), [false, 0]], "three"]))
+      .toBe("one<b>two</b>0three")
+  })
+
+  it("escapes all HTML-sensitive text characters", () => {
+    expect(print(`&<>"'`)).toBe("&amp;&lt;&gt;&quot;&#39;")
+  })
+
+  it("does not share output buffers between calls", () => {
+    expect(print("first")).toBe("first")
+    expect(print("second")).toBe("second")
+  })
+
+  it("merges attributes from nested content arrays", () => {
+    expect(print(new Element("div", false, [[{ class: "one" }], { class: "two" }, { id: "main" }])))
+      .toBe('<div class="one two" id="main"></div>')
+  })
+
+  it("keeps the last value for repeated inline CSS properties", () => {
+    expect(print(new Element("p", false, [new Property("color", "red"), new Property("color", "blue")])))
+      .toBe('<p style="color: blue"></p>')
+  })
+
+  it("keeps the last value for repeated rule declarations", () => {
+    expect(print(new Rule("p", [new Property("color", "red"), new Property("color", "blue")])))
+      .toBe("p{color:blue}")
+  })
+
+  it("renders raw content inside an element without changing it", () => {
+    expect(print(new Element("script", false, [new Raw('if (count < 2) alert("ok");')])))
+      .toBe('<script>if (count < 2) alert("ok");</script>')
+  })
+
+  it("omits children and closing tags for void elements", () => {
+    expect(print(new Element("hr", true, ["ignored", new Element("p", false, ["ignored"])])))
+      .toBe("<hr>")
+  })
+
+  describe("regressions", () => {
+    it("escapes HTML attribute values", () => {
+      expect(print(new Element("div", false, [{ title: 'A "quote" & <tag>' }])))
+        .toBe('<div title="A &quot;quote&quot; &amp; &lt;tag&gt;"></div>')
+    })
+
+    it("escapes serialized inline style attributes", () => {
+      expect(print(new Element("p", false, [new Property("font-family", '"Example"')])))
+        .toBe('<p style="font-family: &quot;Example&quot;"></p>')
+    })
+
+    it("escapes CSS values only when serializing an HTML attribute", () => {
+      const property = new Property("font-family", '"Example & Co"')
+      expect(print(new Element("p", false, [property])))
+        .toBe('<p style="font-family: &quot;Example &amp; Co&quot;"></p>')
+      expect(print(new Rule("p", [property]))).toBe('p{font-family:"Example & Co"}')
+    })
+  })
+})

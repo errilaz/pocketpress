@@ -286,6 +286,16 @@ document do
       td dont-repeat-yourself
 ```
 
+## Testing
+
+```sh
+pnpm run test:run
+```
+
+Runs the full suite once, including CLI builds and watch-mode rebuilds. CLI tests require Node.js and Bash and execute current TypeScript sources through `ts-node`, not previously built files in `lib`.
+
+Use `pnpm test` for interactive test watching. Fixtures run in temporary directories and are removed afterward. See [test coverage and regressions](test/README.md) for details.
+
 ## VSCode Settings
 
 For less clutter, you can collapse generated files in Visual Studio Code with these settings:

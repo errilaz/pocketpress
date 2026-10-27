@@ -18,7 +18,7 @@ export async function render(build: SiteBuild) {
   }
   const entries = site.templates
     .filter(t => !!t.date && t.feed !== false)
-    .sort((a, b) => b.date!.getDate()! - a.date!.getDate())
+    .sort((first, second) => second.date!.getTime() - first.date!.getTime())
   if (tagTemplate) {
     articles.push(...compileTagArticles(tagTemplate, build, site))
   }
@@ -55,7 +55,7 @@ export async function render(build: SiteBuild) {
 
 async function writeSiteMetadata(build: SiteBuild, site: SiteDetails, entries: Template[]) {
   const packageJson = join(build.root, "package.json")
-  if (!exists(packageJson)) return
+  if (!await exists(packageJson)) return
   const config = JSON.parse(await read(packageJson))?.pocket as SiteConfig
   if (!config || !config.baseUrl) return
 
@@ -164,9 +164,7 @@ async function exists(path: string) {
 
 async function write(path: string, data: string) {
   const dir = dirname(path)
-  if (!exists(dir)) {
-    await mkdir(dir, { recursive: true })
-  }
+  await mkdir(dir, { recursive: true })
   await writeFile(path, data, "utf8")
 }
 
