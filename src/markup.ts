@@ -8,7 +8,7 @@ import cssesc from "cssesc"
 import { createTemplate } from "./createTemplate"
 
 /** Functions for the template DSL. */
-export module Markup {
+export namespace Markup {
   /** Constructs a CSS rule. */
   export function rule(selector: string, ...contents: (Property | Rule)[]) {
     return new Rule(selector, contents)

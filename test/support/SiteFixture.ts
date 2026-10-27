@@ -68,16 +68,14 @@ export namespace SiteFixture {
     return rm(site.directory, { recursive: true, force: true })
   }
 
-  export function start(site: SiteFixture, args: string[] = [], env: NodeJS.ProcessEnv = {}): Process {
-    const child = spawn("bash", [resolve(__dirname, "../../bin/pocket"), ...args], {
+  export function start(site: SiteFixture, args: string[] = [], preload?: string): Process {
+    const runtimeArgs = preload ? ["--preload", preload] : []
+    const child = spawn("bun", [...runtimeArgs, resolve(__dirname, "../../bin/pocket"), ...args], {
       cwd: site.root,
       detached: true,
       env: {
         ...process.env,
-        POCKET_DEV: "true",
-        TS_NODE_TRANSPILE_ONLY: "true",
         TZ: "UTC",
-        ...env,
       },
       stdio: "pipe",
     })

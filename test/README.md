@@ -3,6 +3,7 @@
 ## Run
 
 ```sh
+pnpm run check
 pnpm run test:run
 pnpm exec vitest run test/site.test.ts --threads false
 pnpm exec vitest run test/watch.test.ts --threads false
@@ -10,12 +11,14 @@ pnpm exec vitest run test/watch.test.ts --threads false
 
 `test:run` runs once without worker threads. CLI tests already start separate processes. `pnpm test` retains Vitest's interactive watch mode.
 
-Node.js, Bash, and the installed development dependencies are required. Vite is declared directly because Vitest resolves it from the project root.
+Node.js, Bun 1.4.2 or newer, and the installed development dependencies are required. Node.js runs Vitest; Bun runs PocketPress. Bash and ts-node are not required. Vite is declared directly because Vitest resolves it from the project root.
+
+`check` uses TypeScript 7 with `preserve`/`bundler` module settings and `noEmit` to check production sources, the code generator, and tests.
 
 ## Coverage
 
 - `site.test.ts`: a complete LiveScript site with layouts, nested includes, HTML/CSS/Markdown outputs, metadata, navigation, tag pages, feeds, sitemap, and robots.
-- `cli.test.ts`: command flags, discovery, exclusions, output paths, optional site metadata, file reads, site-local dependencies, rebuilds, and error diagnostics.
+- `cli.test.ts`: command flags, discovery, exclusions, output paths, optional site metadata, file reads, Bun execution, template-relative `require`, site-local dependencies, rebuilds, and error diagnostics.
 - `template.test.ts`: compilation, evaluation scopes, generated DSL names, helper injection, includes, and errors.
 - `markup.test.ts`: class proxies, CSS helpers, embedded Markdown and LiveScript, raw content, document composition, links, and reload markup.
 - `metadata.test.ts`: JSON Feed and Atom fields, URL handling, defaults, escaping, and sitemap selection.
@@ -28,11 +31,13 @@ XML checks cover expected structure and fields; they are not full XML schema val
 
 `SiteFixture` creates a temporary site and a separate existing output directory. It supplies an empty `package.json` unless a test overrides or removes it. The complete site lives in `fixtures/site` and is copied before execution.
 
-CLI tests invoke `bin/pocket` with `POCKET_DEV=true` and `TS_NODE_TRANSPILE_ONLY=true`. This exercises current sources without relying on stale `lib` output. These execution tests do not perform TypeScript checking. Child processes use UTC for deterministic dates and have bounded execution times.
+CLI tests invoke `bin/pocket` with Bun. This exercises current sources without a compiled `lib` directory or runtime-selection environment variables. These execution tests do not perform TypeScript checking; run `check` separately. Child processes use UTC for deterministic dates and have bounded execution times.
 
-Watch tests preload `support/watch-ready.cjs`. This observer wraps the real Chokidar factory only to report its `ready` event; it does not replace file watching. Tests wait for readiness and completed rebuilds instead of guessing startup delays. Cleanup terminates the child process group before removing temporary files.
+Watch tests use Bun's `--preload` flag to load `support/watch-ready.cjs`. This observer wraps the real Chokidar factory only to report its `ready` event; it does not replace file watching. Tests wait for readiness and completed rebuilds instead of guessing startup delays. Cleanup terminates the child process group before removing temporary files.
 
 Direct markup tests initialize `createTemplate` first, matching the CLI's load order through the existing circular imports.
+
+The standalone `pocketpress/markup` export still has a circular-initialization failure. It reproduces before the Bun migration and does not affect normal CLI startup. This migration does not change that existing limitation.
 
 ## Regression coverage
 

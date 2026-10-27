@@ -1,24 +1,18 @@
 {
   "compilerOptions": {
     "target": "ES2018",
-    "module": "commonjs",
+    "module": "preserve",
     "lib": ["ES2020"],
     "types": ["node"],
-    "outDir": "lib",
+    "noEmit": true,
     "esModuleInterop": true,
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "sourceMap": true,
-    "declaration": true,
     "strict": true,
     "noImplicitReturns": true,
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": false,
   },
-  "include": ["src"],
-  "exclude": [
-    "src/generateRun.ts",
-    "src/runTemplate.ts"
-  ]
+  "include": ["src"]
 }

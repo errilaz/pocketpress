@@ -156,6 +156,54 @@ describe("pocket CLI", () => {
     expect(await SiteFixture.read(site, "index.html")).toContain("<p>Site dependency</p>")
   })
 
+  it("executes templates under Bun", async () => {
+    site = await SiteFixture.create({
+      "index.html.ls": 'page: p (if process.versions.bun then "Bun" else "Other runtime")',
+    })
+    SiteFixture.assertSuccess(await SiteFixture.run(site))
+    expect(await SiteFixture.read(site, "index.html")).toBe("<!DOCTYPE html>\n<p>Bun</p>")
+  })
+
+  it("provides require for Node-compatible built-ins inside evaluated templates", async () => {
+    site = await SiteFixture.create({
+      "index.html.ls": 'page: p (require("node:path").basename "/posts/entry.html")',
+    })
+    SiteFixture.assertSuccess(await SiteFixture.run(site))
+    expect(await SiteFixture.read(site, "index.html")).toBe("<!DOCTYPE html>\n<p>entry.html</p>")
+  })
+
+  it("resolves relative requires from the template rather than PocketPress", async () => {
+    site = await SiteFixture.create({
+      "posts/message.cjs": 'module.exports = "Template dependency"',
+      "posts/index.html.ls": 'page: p require "./message.cjs"',
+    })
+    SiteFixture.assertSuccess(await SiteFixture.run(site))
+    expect(await SiteFixture.read(site, "posts/index.html"))
+      .toBe("<!DOCTYPE html>\n<p>Template dependency</p>")
+  })
+
+  it("binds require independently for included templates and their callers", async () => {
+    site = await SiteFixture.create({
+      "message.cjs": 'module.exports = "Root dependency"',
+      "parts/message.cjs": 'module.exports = "Partial dependency"',
+      "parts/partial.ls": 'p require "./message.cjs"',
+      "index.html.ls": 'page: div (include "parts/partial.ls"), (p require "./message.cjs")',
+    })
+    SiteFixture.assertSuccess(await SiteFixture.run(site))
+    expect(await SiteFixture.read(site, "index.html"))
+      .toBe("<!DOCTYPE html>\n<div><p>Partial dependency</p><p>Root dependency</p></div>")
+  })
+
+  it("keeps template dependencies separate from PocketPress dependencies", async () => {
+    site = await SiteFixture.create({
+      "node_modules/marked/index.js": 'module.exports = "Site marked"',
+      "index.html.ls": 'page: div (p require "marked"), (markdown "**Real parser**")',
+    })
+    SiteFixture.assertSuccess(await SiteFixture.run(site))
+    expect(await SiteFixture.read(site, "index.html"))
+      .toBe("<!DOCTYPE html>\n<div><p>Site marked</p><p><strong>Real parser</strong></p>\n</div>")
+  })
+
   it("rebuilds changed partials without consuming generated files", async () => {
     site = await SiteFixture.create({
       "index.html.ls": 'page: include "partial.ls"',

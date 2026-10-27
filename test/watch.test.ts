@@ -14,9 +14,7 @@ describe("watch mode", () => {
       "partial.ls": 'p "Original content"',
     })
     const observer = resolve(__dirname, "support/watch-ready.cjs")
-    running = SiteFixture.start(site, ["--watch"], {
-      NODE_OPTIONS: `${process.env.NODE_OPTIONS || ""} --require ${JSON.stringify(observer)}`,
-    })
+    running = SiteFixture.start(site, ["--watch"], observer)
     await SiteFixture.waitForOutput(running, "POCKETPRESS_TEST_WATCH_READY")
   }, 15000)
 

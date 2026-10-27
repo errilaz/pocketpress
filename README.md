@@ -6,6 +6,8 @@ PocketPress is a little zero-config SSG that produces HTML/CSS from a [LiveScrip
 
 ## Install
 
+Requires [Bun](https://bun.sh) 1.4.2 or newer on `PATH`. PocketPress runs TypeScript source directly; Node.js and ts-node are not supported CLI runtimes. Templates still use LiveScript.
+
 ```sh 
 npm install pocketpress
 # or
@@ -289,12 +291,26 @@ document do
 ## Testing
 
 ```sh
+pnpm run check
 pnpm run test:run
 ```
 
-Runs the full suite once, including CLI builds and watch-mode rebuilds. CLI tests require Node.js and Bash and execute current TypeScript sources through `ts-node`, not previously built files in `lib`.
+`check` uses TypeScript 7 to check sources, code generation, and tests without emitting JavaScript. `test:run` runs the full suite once, including Bun CLI builds and watch-mode rebuilds. Vitest still runs under Node.js; CLI subprocesses run under Bun. Bash and ts-node are not required.
 
 Use `pnpm test` for interactive test watching. Fixtures run in temporary directories and are removed afterward. See [test coverage and regressions](test/README.md) for details.
+
+## Development
+
+```sh
+bun bin/pocket --help
+pnpm run generate-run
+```
+
+`generate-run` uses Bun to regenerate `src/run.ts` from `src/runTemplate.ts`. Keep evaluator changes in the template so regeneration preserves them.
+
+The package ships `bin` and `src`; there is no compiled `lib` build. The old `build` and `clean` scripts are replaced by `check`. `POCKET_DEV` is no longer used. pnpm remains the package manager.
+
+Templates can use `require` for built-ins and packages. Relative paths and package lookup resolve from the current template, including included templates, rather than the PocketPress installation. No `NODE_PATH` setup is needed.
 
 ## VSCode Settings
 
