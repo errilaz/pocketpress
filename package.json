@@ -1,6 +1,6 @@
 {
   "name": "pocketpress",
-  "version": "0.0.31",
+  "version": "1.0.0",
   "description": "PocketPress SSG",
   "type": "module",
   "packageManager": "bun@1.4.2",
