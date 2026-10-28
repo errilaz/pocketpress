@@ -6,7 +6,7 @@ import { watcher } from "./watcher"
 const parse = options({
   path: options.arg(0),
   output: options.flag("o"),
-  exclude: options.list("e", ""),
+  exclude: options.list("e"),
   watch: options.bit("w"),
   help: options.bit("h"),
 })

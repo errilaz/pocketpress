@@ -92,7 +92,7 @@ export namespace Markup {
 
   /** Parses markdown and returns a Raw containing the HTML. */
   export function markdown(markdown: string) {
-    return new Raw(marked.parse(markdown))
+    return new Raw(marked.parse(markdown, { async: false }))
   }
 
   /** Factory for `load-file` functions. */

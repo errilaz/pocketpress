@@ -5,13 +5,13 @@
 ```sh
 bun run check
 bun run test:run
-bun run test --run test/site.test.ts --threads false
-bun run test --run test/watch.test.ts --threads false
+bun run test --run test/site.test.ts
+bun run test --run test/watch.test.ts
 ```
 
-`test:run` runs once without worker threads. CLI tests already start separate processes. `bun run test` retains Vitest's interactive watch mode.
+`test:run` runs once with one worker and no file-level parallelism. CLI tests start separate Bun processes. `bun run test` retains Vitest's interactive watch mode.
 
-Node.js, Bun 1.4.2 or newer, and the installed development dependencies are required. Node.js runs Vitest; Bun runs PocketPress. Bash and ts-node are not required. Vite is declared directly because Vitest resolves it from the project root.
+Node.js 22.12+ on the 22.x line, 24.x, or 26+, Bun 1.4.2 or newer, and the installed development dependencies are required. Node.js runs Vitest; Bun runs PocketPress. Bash and ts-node are not required. Vite supplies Vitest's transformation pipeline.
 
 `check` uses TypeScript 7 with `preserve`/`bundler` module settings and `noEmit` to check production sources, the code generator, and tests.
 
@@ -23,7 +23,7 @@ Node.js, Bun 1.4.2 or newer, and the installed development dependencies are requ
 - `markup.test.ts`: class proxies, CSS helpers, embedded Markdown and LiveScript, raw content, document composition, links, and reload markup.
 - `metadata.test.ts`: JSON Feed and Atom fields, URL handling, defaults, escaping, and sitemap selection.
 - `print.test.ts`: HTML/CSS serialization and content boundaries.
-- `watch.test.ts`: real initial builds, partial changes, source additions/removals, syntax-error recovery, and reload-script behavior.
+- `watch.test.ts`: real initial builds, partial changes, source additions/removals, new directory discovery, exclusions, syntax-error recovery, and reload-script behavior.
 
 XML checks cover expected structure and fields; they are not full XML schema validation. Browser reload behavior runs against a small VM-based DOM substitute, not a browser.
 
@@ -33,7 +33,7 @@ XML checks cover expected structure and fields; they are not full XML schema val
 
 CLI tests invoke `bin/pocket` with Bun. This exercises current sources without a compiled `lib` directory or runtime-selection environment variables. These execution tests do not perform TypeScript checking; run `check` separately. Child processes use UTC for deterministic dates and have bounded execution times.
 
-Watch tests use Bun's `--preload` flag to load `support/watch-ready.cjs`. This observer wraps the real Chokidar factory only to report its `ready` event; it does not replace file watching. Tests wait for readiness and completed rebuilds instead of guessing startup delays. Cleanup terminates the child process group before removing temporary files.
+Watch tests use Bun's `--preload` flag to load `support/watch-ready.cjs`. This observer wraps the real Chokidar watcher's event emitter to report its `ready` event and watched paths; it does not replace file watching. Tests wait for readiness and completed rebuilds instead of guessing startup delays. Cleanup terminates the child process group before removing temporary files.
 
 Direct markup tests initialize `createTemplate` first, matching the CLI's load order through the existing circular imports.
 

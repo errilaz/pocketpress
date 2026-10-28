@@ -12,9 +12,15 @@ describe("watch mode", () => {
     site = await SiteFixture.create({
       "index.html.ls": 'page: div (include "partial.ls"), (live-reload!)',
       "partial.ls": 'p "Original content"',
+      ".git/ignored.html.ls": "page: (",
+      "node_modules/ignored.html.ls": "page: (",
+      "drafts/ignored.html.ls": "page: (",
+      "notes.txt": "Not a template",
+      "manual.md": "Not a template",
+      "static.css": "body{color:red}",
     })
     const observer = resolve(__dirname, "support/watch-ready.cjs")
-    running = SiteFixture.start(site, ["--watch"], observer)
+    running = SiteFixture.start(site, ["--watch", "--exclude", "drafts"], observer)
     await SiteFixture.waitForOutput(running, "POCKETPRESS_TEST_WATCH_READY")
   }, 15000)
 
@@ -43,6 +49,33 @@ describe("watch mode", () => {
     await SiteFixture.waitForOutput(running!, "rebuilt site in", offset)
     expect(await SiteFixture.read(site, "index.html")).toContain("<p>Updated partial content</p>")
     expect(await SiteFixture.read(site, ".live-reload.js")).not.toBe(stamp)
+  })
+
+  it("watches only LiveScript sources outside excluded directories", () => {
+    const prefix = "POCKETPRESS_TEST_WATCHED "
+    const snapshot = running!.stdout.split("\n").find(line => line.startsWith(prefix))
+    expect(snapshot).toBeDefined()
+    const watched: Record<string, string[]> = JSON.parse(snapshot!.slice(prefix.length))
+    const files = Object.entries(watched).flatMap(([directory, names]) =>
+      names.map(name => resolve(site.root, directory, name)),
+    )
+    expect(files).toContain(join(site.root, "index.html.ls"))
+    expect(files).toContain(join(site.root, "partial.ls"))
+    for (const path of [
+      ".git/ignored.html.ls", "node_modules/ignored.html.ls", "drafts/ignored.html.ls",
+      "notes.txt", "manual.md", "static.css", "index.html", ".live-reload.js", "package.json",
+    ]) {
+      expect(files).not.toContain(join(site.root, path))
+    }
+  })
+
+  it("discovers LiveScript pages inside directories created after startup", async () => {
+    const offset = running!.stdout.length
+    await SiteFixture.write(site, "new-tree/nested/entry.html.ls", 'page: h1 "New nested page"')
+    await SiteFixture.waitForOutput(running!, "rebuilt site in", offset)
+    expect(await SiteFixture.read(site, "new-tree/nested/entry.html"))
+      .toBe("<!DOCTYPE html>\n<h1>New nested page</h1>")
+    expect(running!.stderr).toBe("")
   })
 
   it("refreshes the site index when source pages are added and removed", async () => {

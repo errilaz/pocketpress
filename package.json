@@ -31,28 +31,27 @@
     "generate-run": "bun src/generateRun.ts",
     "check": "tsc --project . && tsc --project tsconfig.test.json",
     "test": "vitest",
-    "test:run": "vitest run --threads false"
+    "test:run": "vitest run"
   },
   "exports": {
     "./markup": "./src/markup.ts"
   },
   "dependencies": {
-    "chokidar": "^3.5.3",
+    "chokidar": "^6.0.0",
     "cssesc": "^3.0.0",
     "escape-html": "^1.0.3",
     "livescript": "^1.6.0",
-    "marked": "^4.2.5",
-    "toptions": "^1.0.2"
+    "marked": "^18.1.1",
+    "toptions": "^2.0.3"
   },
   "devDependencies": {
-    "@types/cssesc": "^3.0.0",
-    "@types/escape-html": "^1.0.2",
-    "@types/marked": "^4.0.8",
-    "@types/node": "^18.11.18",
+    "@types/cssesc": "^3.0.2",
+    "@types/escape-html": "^1.0.4",
+    "@types/node": "^22.20.5",
     "html-tags": "^3.2.0",
     "known-css-properties": "^0.26.0",
     "typescript": "^7.0.2",
-    "vite": "^4.0.4",
-    "vitest": "^0.28.2"
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
   }
 }
