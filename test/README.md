@@ -3,13 +3,13 @@
 ## Run
 
 ```sh
-pnpm run check
-pnpm run test:run
-pnpm exec vitest run test/site.test.ts --threads false
-pnpm exec vitest run test/watch.test.ts --threads false
+bun run check
+bun run test:run
+bun run test --run test/site.test.ts --threads false
+bun run test --run test/watch.test.ts --threads false
 ```
 
-`test:run` runs once without worker threads. CLI tests already start separate processes. `pnpm test` retains Vitest's interactive watch mode.
+`test:run` runs once without worker threads. CLI tests already start separate processes. `bun run test` retains Vitest's interactive watch mode.
 
 Node.js, Bun 1.4.2 or newer, and the installed development dependencies are required. Node.js runs Vitest; Bun runs PocketPress. Bash and ts-node are not required. Vite is declared directly because Vitest resolves it from the project root.
 

@@ -3,6 +3,7 @@
   "version": "0.0.31",
   "description": "PocketPress SSG",
   "type": "module",
+  "packageManager": "bun@1.4.2",
   "license": "MIT",
   "author": {
     "name": "errilaz",

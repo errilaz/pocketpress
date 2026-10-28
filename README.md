@@ -9,11 +9,7 @@ PocketPress is a little zero-config SSG that produces HTML/CSS from a [LiveScrip
 Requires [Bun](https://bun.sh) 1.4.2 or newer on `PATH`. PocketPress runs TypeScript source directly; Node.js and ts-node are not supported CLI runtimes.
 
 ```sh 
-npm install pocketpress
-# or
-pnpm add pocketpress
-# or
-yarn add pocketpress
+bun add pocketpress
 ```
 
 ## Usage
