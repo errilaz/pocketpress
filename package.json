@@ -37,6 +37,17 @@
     "./markup": "./src/markup.ts"
   },
   "dependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
+    "@danielx/civet": "^0.11.16",
+    "@hypeup/babel": "^1.4.0",
+    "@hypeup/client": "^1.3.0",
+    "@hypeup/escape-html": "^1.2.0",
+    "@hypeup/lexicon": "^1.3.0",
+    "@hypeup/plugin": "^1.3.0",
+    "@hypeup/render": "^1.3.0",
+    "@hypeup/runtime": "^1.3.0",
+    "@hypeup/vdom": "^1.2.0",
     "chokidar": "^6.0.0",
     "cssesc": "^3.0.0",
     "escape-html": "^1.0.3",
@@ -45,6 +56,8 @@
     "toptions": "^2.0.3"
   },
   "devDependencies": {
+    "@types/babel__core": "^7.20.5",
+    "@types/bun": "~1.4.2",
     "@types/cssesc": "^3.0.2",
     "@types/escape-html": "^1.0.4",
     "@types/node": "^22.20.5",
